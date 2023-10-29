@@ -53,6 +53,8 @@ Apache Commons Net
 Apache Commons Net library contains a collection of network utilities and protocol implementations.
 Supported protocols include: Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois.
 
+Forked by Daniele Fabiano and Francesco Maria Puca.
+
 Documentation
 -------------
 
