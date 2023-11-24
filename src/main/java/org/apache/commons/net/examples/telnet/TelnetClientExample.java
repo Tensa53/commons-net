@@ -197,9 +197,10 @@ public class TelnetClientExample implements Runnable, TelnetNotificationHandler 
                 }
             } catch (final IOException e) {
                 System.err.println("Exception while connecting:" + e.getMessage());
-                System.exit(1);
+                break;
             }
         }
+        System.exit(1);
     }
 
     /**
