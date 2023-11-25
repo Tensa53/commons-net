@@ -284,30 +284,31 @@ public class SMTPSClient extends SMTPClient {
         final SSLSocketFactory ssf = context.getSocketFactory();
         final String host = _hostname_ != null ? _hostname_ : getRemoteAddress().getHostAddress();
         final int port = getRemotePort();
-        final SSLSocket socket = (SSLSocket) ssf.createSocket(_socket_, host, port, true);
-        socket.setEnableSessionCreation(true);
-        socket.setUseClientMode(true);
+        try(final SSLSocket socket = (SSLSocket) ssf.createSocket(_socket_, host, port, true)){
+            socket.setEnableSessionCreation(true);
+            socket.setUseClientMode(true);
 
-        if (tlsEndpointChecking) {
-            SSLSocketUtils.enableEndpointNameVerification(socket);
-        }
-        if (protocols != null) {
-            socket.setEnabledProtocols(protocols);
-        }
-        if (suites != null) {
-            socket.setEnabledCipherSuites(suites);
-        }
-        socket.startHandshake();
+            if (tlsEndpointChecking) {
+                SSLSocketUtils.enableEndpointNameVerification(socket);
+            }
+            if (protocols != null) {
+                socket.setEnabledProtocols(protocols);
+            }
+            if (suites != null) {
+                socket.setEnabledCipherSuites(suites);
+            }
+            socket.startHandshake();
 
-        // TODO the following setup appears to duplicate that in the super class methods
-        _socket_ = socket;
-        _input_ = socket.getInputStream();
-        _output_ = socket.getOutputStream();
-        reader = new CRLFLineReader(new InputStreamReader(_input_, encoding));
-        writer = new BufferedWriter(new OutputStreamWriter(_output_, encoding));
+            // TODO the following setup appears to duplicate that in the super class methods
+            _socket_ = socket;
+            _input_ = socket.getInputStream();
+            _output_ = socket.getOutputStream();
+            reader = new CRLFLineReader(new InputStreamReader(_input_, encoding));
+            writer = new BufferedWriter(new OutputStreamWriter(_output_, encoding));
 
-        if (hostnameVerifier != null && !hostnameVerifier.verify(host, socket.getSession())) {
-            throw new SSLHandshakeException("Hostname doesn't match certificate");
+            if (hostnameVerifier != null && !hostnameVerifier.verify(host, socket.getSession())) {
+                throw new SSLHandshakeException("Hostname doesn't match certificate");
+            }
         }
     }
 

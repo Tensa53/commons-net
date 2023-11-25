@@ -279,31 +279,32 @@ public class IMAPSClient extends IMAPClient {
         final SSLSocketFactory ssf = context.getSocketFactory();
         final String host = _hostname_ != null ? _hostname_ : getRemoteAddress().getHostAddress();
         final int port = getRemotePort();
-        final SSLSocket socket = (SSLSocket) ssf.createSocket(_socket_, host, port, true);
-        socket.setEnableSessionCreation(true);
-        socket.setUseClientMode(true);
+        try(final SSLSocket socket = (SSLSocket) ssf.createSocket(_socket_, host, port, true)){
+            socket.setEnableSessionCreation(true);
+            socket.setUseClientMode(true);
 
-        if (tlsEndpointChecking) {
-            SSLSocketUtils.enableEndpointNameVerification(socket);
-        }
+            if (tlsEndpointChecking) {
+                SSLSocketUtils.enableEndpointNameVerification(socket);
+            }
 
-        if (protocols != null) {
-            socket.setEnabledProtocols(protocols);
-        }
-        if (suites != null) {
-            socket.setEnabledCipherSuites(suites);
-        }
-        socket.startHandshake();
+            if (protocols != null) {
+                socket.setEnabledProtocols(protocols);
+            }
+            if (suites != null) {
+                socket.setEnabledCipherSuites(suites);
+            }
+            socket.startHandshake();
 
-        // TODO the following setup appears to duplicate that in the super class methods
-        _socket_ = socket;
-        _input_ = socket.getInputStream();
-        _output_ = socket.getOutputStream();
-        _reader = new CRLFLineReader(new InputStreamReader(_input_, __DEFAULT_ENCODING));
-        __writer = new BufferedWriter(new OutputStreamWriter(_output_, __DEFAULT_ENCODING));
+            // TODO the following setup appears to duplicate that in the super class methods
+            _socket_ = socket;
+            _input_ = socket.getInputStream();
+            _output_ = socket.getOutputStream();
+            _reader = new CRLFLineReader(new InputStreamReader(_input_, __DEFAULT_ENCODING));
+            __writer = new BufferedWriter(new OutputStreamWriter(_output_, __DEFAULT_ENCODING));
 
-        if (hostnameVerifier != null && !hostnameVerifier.verify(host, socket.getSession())) {
-            throw new SSLHandshakeException("Hostname doesn't match certificate");
+            if (hostnameVerifier != null && !hostnameVerifier.verify(host, socket.getSession())) {
+                throw new SSLHandshakeException("Hostname doesn't match certificate");
+            }
         }
     }
 

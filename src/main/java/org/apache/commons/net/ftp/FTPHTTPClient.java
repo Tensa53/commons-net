@@ -145,21 +145,22 @@ public class FTPHTTPClient extends FTPClient {
             passiveHost = this.getPassiveHost();
         }
 
-        final Socket socket = _socketFactory_.createSocket(proxyHost, proxyPort);
-        final InputStream is = socket.getInputStream();
-        final OutputStream os = socket.getOutputStream();
-        tunnelHandshake(passiveHost, this.getPassivePort(), is, os);
-        if (getRestartOffset() > 0 && !restart(getRestartOffset())) {
-            socket.close();
-            return null;
-        }
+        try(final Socket socket = _socketFactory_.createSocket(proxyHost, proxyPort)){
+            final InputStream is = socket.getInputStream();
+            final OutputStream os = socket.getOutputStream();
+            tunnelHandshake(passiveHost, this.getPassivePort(), is, os);
+            if (getRestartOffset() > 0 && !restart(getRestartOffset())) {
+                socket.close();
+                return null;
+            }
 
-        if (!FTPReply.isPositivePreliminary(sendCommand(command, arg))) {
-            socket.close();
-            return null;
-        }
+            if (!FTPReply.isPositivePreliminary(sendCommand(command, arg))) {
+                socket.close();
+                return null;
+            }
 
-        return socket;
+            return socket;
+        }
     }
 
     @Override
