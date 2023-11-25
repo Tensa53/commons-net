@@ -122,13 +122,9 @@ public class DefaultSocketFactory extends SocketFactory {
     @Override
     public Socket createSocket(final InetAddress address, final int port) throws IOException {
         if (connProxy != null) {
-            try(final Socket s = new Socket(connProxy))
-            {
-             s.connect(new InetSocketAddress(address, port));
-             return s;
-            } catch(final Exception e){
-                throw new IOException("Error during createSocket");
-            }
+            final Socket s = new Socket(connProxy);
+            s.connect(new InetSocketAddress(address, port));
+            return s;
         }
         return new Socket(address, port);
     }
@@ -146,14 +142,10 @@ public class DefaultSocketFactory extends SocketFactory {
     @Override
     public Socket createSocket(final InetAddress address, final int port, final InetAddress localAddr, final int localPort) throws IOException {
         if (connProxy != null) {
-            try(final Socket s = new Socket(connProxy))
-            {
-                s.bind(new InetSocketAddress(localAddr, localPort));
-                s.connect(new InetSocketAddress(address, port));
-                return s;
-            }  catch(final Exception e){
-                throw new IOException("Error during createSocket");
-            }
+            final Socket s = new Socket(connProxy);
+            s.bind(new InetSocketAddress(localAddr, localPort));
+            s.connect(new InetSocketAddress(address, port));
+            return s;
         }
         return new Socket(address, port, localAddr, localPort);
     }
@@ -170,13 +162,9 @@ public class DefaultSocketFactory extends SocketFactory {
     @Override
     public Socket createSocket(final String host, final int port) throws UnknownHostException, IOException {
         if (connProxy != null) {
-            try(final Socket s = new Socket(connProxy))
-            {
-                s.connect(new InetSocketAddress(host, port));
-                return s;
-            }  catch(final Exception e){
-                throw new IOException("Error during createSocket");
-            }
+            final Socket s = new Socket(connProxy);
+            s.connect(new InetSocketAddress(host, port));
+            return s;
         }
         return new Socket(host, port);
     }
@@ -195,15 +183,10 @@ public class DefaultSocketFactory extends SocketFactory {
     @Override
     public Socket createSocket(final String host, final int port, final InetAddress localAddr, final int localPort) throws UnknownHostException, IOException {
         if (connProxy != null) {
-            try(final Socket s = new Socket(connProxy))
-            {
-                s.bind(new InetSocketAddress(localAddr, localPort));
-                s.connect(new InetSocketAddress(host, port));
-                return s;
-            } catch(final Exception e)
-            {
-              throw new IOException("Error during createSocket");
-            }
+            final Socket s = new Socket(connProxy);
+            s.bind(new InetSocketAddress(localAddr, localPort));
+            s.connect(new InetSocketAddress(host, port));
+            return s;
         }
         return new Socket(host, port, localAddr, localPort);
     }
