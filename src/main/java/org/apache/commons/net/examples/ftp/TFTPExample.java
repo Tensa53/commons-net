@@ -17,7 +17,6 @@
 
 package org.apache.commons.net.examples.ftp;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -46,21 +45,7 @@ public final class TFTPExample {
             + "options: (The default is to assume -r -b)\n" + "\t-t timeout in seconds (default 60s)\n" + "\t-s Send a local file\n"
             + "\t-r Receive a remote file\n" + "\t-a Use ASCII transfer mode\n" + "\t-b Use binary transfer mode\n" + "\t-v Verbose (trace packets)\n";
 
-    private static boolean close(final TFTPClient tftp, final Closeable output) {
-        boolean closed;
-        tftp.close();
-        try {
-            if (output != null) {
-                output.close();
-            }
-            closed = true;
-        } catch (final IOException e) {
-            closed = false;
-            System.err.println("Error: error closing file.");
-            System.err.println(e.getMessage());
-        }
-        return closed;
-    }
+    //close() removed, try with resources closes output automatically, so ftp.close() is used instead.
 
     public static void main(final String[] args) throws IOException {
         boolean receiveFile = true, closed;
@@ -155,10 +140,10 @@ public final class TFTPExample {
     }
 
     private static boolean receive(final int transferMode, final String hostname, final String localFilename, final String remoteFilename,
-            final TFTPClient tftp) throws IOException {
+                                   final TFTPClient tftp) throws IOException {
         final boolean closed;
-        FileOutputStream output;
         final File file;
+        String errorMessage; //Used to distinguish failure cases between opening local file and receiving remote file
 
         file = new File(localFilename);
 
@@ -168,18 +153,17 @@ public final class TFTPExample {
             return false;
         }
 
-        // Try to open local file for writing
-        try {
-            output = new FileOutputStream(file);
-        } catch (final IOException e) {
-            tftp.close();
-            throw new IOException("Error: could not open local file for writing.", e);
-        }
-
         open(tftp);
 
-        // Try to receive remote file via TFTP
-        try {
+        errorMessage = "Error: could not  open local file for writing.";
+
+        // Try to receive remote file via TFTP: opens remote file for output in try
+        try(FileOutputStream output = new FileOutputStream(file)){
+
+            //File succesfully opened, error message changes.
+
+            errorMessage = "Error: I/O exception occurred while receiving file.";
+
             final String[] parts = hostname.split(":");
             if (parts.length == 2) {
                 tftp.receiveFile(remoteFilename, transferMode, output, parts[0], Integer.parseInt(parts[1]));
@@ -191,34 +175,32 @@ public final class TFTPExample {
             System.err.println(e.getMessage());
             System.exit(1);
         } catch (final IOException e) {
-            System.err.println("Error: I/O exception occurred while receiving file.");
+            System.err.println(errorMessage);
             System.err.println(e.getMessage());
             System.exit(1);
         } finally {
             // Close local socket and output file
-            closed = close(tftp, output);
+            tftp.close();
         }
-
-        return closed;
+        return true;
     }
 
     private static boolean send(final int transferMode, final String hostname, final String localFilename, final String remoteFilename, final TFTPClient tftp)
             throws IOException {
         final boolean closed;
-        FileInputStream input;
-
-        // Try to open local file for reading
-        try {
-            input = new FileInputStream(localFilename);
-        } catch (final IOException e) {
-            tftp.close();
-            throw new IOException("Error: could not open local file for reading.", e);
-        }
+        String errorMessage; //Used to distinguish failure cases between opening local file and receiving remote file
 
         open(tftp);
 
-        // Try to send local file via TFTP
-        try {
+        errorMessage = "Error: could not open local file for reading.";
+
+        // Try to send local file via TFTP: opens input file for reading in try
+        try(FileInputStream input = new FileInputStream(localFilename)){
+
+            //File succesfully opened, error message changes.
+
+            errorMessage = "Error: I/O exception occurred while sending file.";
+
             final String[] parts = hostname.split(":");
             if (parts.length == 2) {
                 tftp.sendFile(remoteFilename, transferMode, input, parts[0], Integer.parseInt(parts[1]));
@@ -230,15 +212,14 @@ public final class TFTPExample {
             System.err.println(e.getMessage());
             System.exit(1);
         } catch (final IOException e) {
-            System.err.println("Error: I/O exception occurred while sending file.");
+            System.err.println(errorMessage);
             System.err.println(e.getMessage());
             System.exit(1);
         } finally {
             // Close local socket and input file
-            closed = close(tftp, input);
+            tftp.close();
         }
-
-        return closed;
+        return true;
     }
 
 }

@@ -131,46 +131,46 @@ public final class IMAPImportMbox {
 
         int total = 0;
         int loaded = 0;
-        try {
-            imap.setSoTimeout(6000);
 
-            final BufferedReader br = new BufferedReader(new FileReader(file)); // TODO charset?
+        imap.setSoTimeout(6000);
 
-            String line;
-            final StringBuilder sb = new StringBuilder();
-            boolean wanted = false; // Skip any leading rubbish
-            while ((line = br.readLine()) != null) {
-                if (line.startsWith("From ")) { // start of message; i.e. end of previous (if any)
-                    if (process(sb, imap, folder, total)) { // process previous message (if any)
-                        loaded++;
+        try (final BufferedReader br = new BufferedReader(new FileReader(file))) {// TODO charset?
+
+                String line;
+                final StringBuilder sb = new StringBuilder();
+                boolean wanted = false; // Skip any leading rubbish
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("From ")) { // start of message; i.e. end of previous (if any)
+                        if (process(sb, imap, folder, total)) { // process previous message (if any)
+                            loaded++;
+                        }
+                        sb.setLength(0);
+                        total++;
+                        wanted = wanted(total, line, msgNums, contains);
+                    } else if (startsWith(line, PATFROM)) { // Unescape ">+From " in body text
+                        line = line.substring(1);
                     }
-                    sb.setLength(0);
-                    total++;
-                    wanted = wanted(total, line, msgNums, contains);
-                } else if (startsWith(line, PATFROM)) { // Unescape ">+From " in body text
-                    line = line.substring(1);
+                    // TODO process first Received: line to determine arrival date?
+                    if (wanted) {
+                        sb.append(line);
+                        sb.append(CRLF);
+                    }
                 }
-                // TODO process first Received: line to determine arrival date?
-                if (wanted) {
-                    sb.append(line);
-                    sb.append(CRLF);
+                br.close();
+                if (wanted && process(sb, imap, folder, total)) { // last message (if any)
+                    loaded++;
                 }
+            } catch (final IOException e) {
+                System.out.println("Error processing msg: " + total + " " + imap.getReplyString());
+                e.printStackTrace();
+                System.exit(10);
+                return;
+            } finally {
+                imap.logout();
+                imap.disconnect();
             }
-            br.close();
-            if (wanted && process(sb, imap, folder, total)) { // last message (if any)
-                loaded++;
-            }
-        } catch (final IOException e) {
-            System.out.println("Error processing msg: " + total + " " + imap.getReplyString());
-            e.printStackTrace();
-            System.exit(10);
-            return;
-        } finally {
-            imap.logout();
-            imap.disconnect();
+            System.out.println("Processed " + total + " messages, loaded " + loaded);
         }
-        System.out.println("Processed " + total + " messages, loaded " + loaded);
-    }
 
     private static boolean process(final StringBuilder sb, final IMAPClient imap, final String folder, final int msgNum) throws IOException {
         final int length = sb.length();
