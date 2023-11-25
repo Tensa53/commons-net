@@ -24,7 +24,6 @@ import java.net.Proxy;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.nio.channels.IllegalBlockingModeException;
 
 import javax.net.SocketFactory;
 

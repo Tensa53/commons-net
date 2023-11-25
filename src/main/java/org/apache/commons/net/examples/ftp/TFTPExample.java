@@ -17,7 +17,6 @@
 
 package org.apache.commons.net.examples.ftp;
 
-import java.io.Closeable;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -140,7 +139,8 @@ public final class TFTPExample {
         }
     }
 
-    private static boolean receive(final int transferMode, final String hostname, final String localFilename, final String remoteFilename, final TFTPClient tftp) throws IOException {
+    private static boolean receive(final int transferMode, final String hostname, final String localFilename, final String remoteFilename,
+                                   final TFTPClient tftp) throws IOException {
         final boolean closed;
         final File file;
         String errorMessage; //Used to distinguish failure cases between opening local file and receiving remote file
