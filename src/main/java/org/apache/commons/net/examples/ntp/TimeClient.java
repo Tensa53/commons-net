@@ -76,7 +76,6 @@ public final class TimeClient {
             client.setDefaultTimeout(Duration.ofSeconds(60));
             client.open();
             System.out.println(client.getDate(InetAddress.getByName(host)));
-            client.close();
             }
         }
 

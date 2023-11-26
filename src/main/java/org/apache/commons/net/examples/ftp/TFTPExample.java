@@ -24,6 +24,8 @@ import java.io.IOException;
 import java.net.SocketException;
 import java.net.UnknownHostException;
 import java.time.Duration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.net.tftp.TFTP;
 import org.apache.commons.net.tftp.TFTPClient;
@@ -141,7 +143,6 @@ public final class TFTPExample {
 
     private static boolean receive(final int transferMode, final String hostname, final String localFilename, final String remoteFilename,
                                    final TFTPClient tftp) throws IOException {
-        final boolean closed;
         final File file;
         String errorMessage; //Used to distinguish failure cases between opening local file and receiving remote file
 
@@ -175,7 +176,7 @@ public final class TFTPExample {
             System.err.println(e.getMessage());
             System.exit(1);
         } catch (final IOException e) {
-            System.err.println(errorMessage);
+            Logger.getAnonymousLogger().log(Level.SEVERE, errorMessage);
             System.err.println(e.getMessage());
             System.exit(1);
         } finally {
@@ -187,7 +188,6 @@ public final class TFTPExample {
 
     private static boolean send(final int transferMode, final String hostname, final String localFilename, final String remoteFilename, final TFTPClient tftp)
             throws IOException {
-        final boolean closed;
         String errorMessage; //Used to distinguish failure cases between opening local file and receiving remote file
 
         open(tftp);
@@ -212,7 +212,7 @@ public final class TFTPExample {
             System.err.println(e.getMessage());
             System.exit(1);
         } catch (final IOException e) {
-            System.err.println(errorMessage);
+            Logger.getAnonymousLogger().log(Level.SEVERE, errorMessage);
             System.err.println(e.getMessage());
             System.exit(1);
         } finally {

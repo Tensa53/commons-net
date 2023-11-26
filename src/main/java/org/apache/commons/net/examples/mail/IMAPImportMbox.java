@@ -156,7 +156,6 @@ public final class IMAPImportMbox {
                         sb.append(CRLF);
                     }
                 }
-                br.close();
                 if (wanted && process(sb, imap, folder, total)) { // last message (if any)
                     loaded++;
                 }
