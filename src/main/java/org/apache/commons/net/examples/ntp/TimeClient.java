@@ -70,13 +70,13 @@ public final class TimeClient {
     }
 
     public static void timeUDP(final String host) throws IOException {
-        final TimeUDPClient client = new TimeUDPClient();
+        try(final TimeUDPClient client = new TimeUDPClient()) {
 
-        // We want to timeout if a response takes longer than 60 seconds
-        client.setDefaultTimeout(Duration.ofSeconds(60));
-        client.open();
-        System.out.println(client.getDate(InetAddress.getByName(host)));
-        client.close();
-    }
+            // We want to timeout if a response takes longer than 60 seconds
+            client.setDefaultTimeout(Duration.ofSeconds(60));
+            client.open();
+            System.out.println(client.getDate(InetAddress.getByName(host)));
+            }
+        }
 
 }
