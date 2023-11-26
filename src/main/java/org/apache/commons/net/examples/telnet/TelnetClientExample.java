@@ -178,15 +178,14 @@ public class TelnetClientExample implements Runnable, TelnetNotificationHandler 
         }
     }
 
-    private static void commandAYT()
-    {
+    private static void commandAYT(){
         try {
             System.out.println("Sending AYT");
             System.out.println("AYT response:" + tc.sendAYT(Duration.ofSeconds(5)));
         } catch (final IOException e) {
             System.err.println("Exception waiting AYT response: " + e.getMessage());
         } catch (InterruptedException e) {
-            throw new RuntimeException(e);
+            Thread.currentThread().interrupt();
         }
     }
 
