@@ -200,9 +200,15 @@ public class TelnetClientExample implements Runnable, TelnetNotificationHandler 
 
         } catch (final IOException e) {
             System.err.println("Exception while opening the spy file: " + e.getMessage());
-        } catch (Exception e) {
+        } catch (final InterruptedException e)
+        {
+            System.err.println("Interrupted exception caught, stopping thread:" + e.getMessage());
+            Thread.currentThread().interrupt();
+        }
+        catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
+            assert fout != null;
             fout.close();
         }
 
@@ -250,7 +256,7 @@ public class TelnetClientExample implements Runnable, TelnetNotificationHandler 
 
         try {
             final byte[] buff = new byte[1024];
-            int ret_read = 0;
+            int ret_read;
 
             do {
                 ret_read = instr.read(buff);
