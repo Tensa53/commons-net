@@ -48,22 +48,18 @@ public class Main {
     public static void main(final String[] args) throws Throwable {
         final Properties fp = new Properties();
         final InputStream ras = Main.class.getResourceAsStream("examples.properties");
+
         if (ras != null) {
             fp.load(ras);
         } else {
             System.err.println("[Cannot find examples.properties file, so aliases cannot be used]");
         }
+
         if (args.length == 0) {
-            if (Thread.currentThread().getStackTrace().length > 2) { // called by Maven
-                System.out.println(
-                        "Usage: mvn -q exec:java  -Dexec.arguments=<alias or" + " exampleClass>,<exampleClass parameters> (comma-separated, no spaces)");
-                System.out.println("Or   : mvn -q exec:java  -Dexec.args=\"<alias" + " or exampleClass> <exampleClass parameters>\" (space separated)");
-            } else if (fromJar()) {
-                System.out.println("Usage: java -jar commons-net-examples-m.n.jar <alias or exampleClass> <exampleClass parameters>");
-            } else {
-                System.out
-                        .println("Usage: java -cp target/classes org.apache.commons.net.examples.Main" + " <alias or exampleClass> <exampleClass parameters>");
-            }
+
+            //method created to reduce cognitive complexity
+            checkStackTrace();
+
             @SuppressWarnings("unchecked") // property names are Strings
             final List<String> l = (List<String>) Collections.list(fp.propertyNames());
             if (l.isEmpty()) {
@@ -82,6 +78,7 @@ public class Main {
         if (fullName == null) {
             fullName = shortName;
         }
+
         try {
             final Class<?> clazz = Class.forName(fullName);
             final Method m = clazz.getDeclaredMethod("main", args.getClass());
@@ -98,6 +95,19 @@ public class Main {
             }
         } catch (final ClassNotFoundException e) {
             System.out.println(e);
+        }
+    }
+
+    private static void checkStackTrace() {
+        if (Thread.currentThread().getStackTrace().length > 2) { // called by Maven
+            System.out.println(
+                    "Usage: mvn -q exec:java  -Dexec.arguments=<alias or" + " exampleClass>,<exampleClass parameters> (comma-separated, no spaces)");
+            System.out.println("Or   : mvn -q exec:java  -Dexec.args=\"<alias" + " or exampleClass> <exampleClass parameters>\" (space separated)");
+        } else if (fromJar()) {
+            System.out.println("Usage: java -jar commons-net-examples-m.n.jar <alias or exampleClass> <exampleClass parameters>");
+        } else {
+            System.out
+                    .println("Usage: java -cp target/classes org.apache.commons.net.examples.Main" + " <alias or exampleClass> <exampleClass parameters>");
         }
     }
 }
