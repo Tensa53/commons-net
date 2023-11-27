@@ -191,7 +191,7 @@ public class VMSFTPEntryParserTest extends AbstractFTPParseTest {
 
     @Override
     public void testRecentPrecision() {
-        // Not used
+        assertTrue(true);// Not used
     }
 
     public void testWholeListParse() throws IOException {

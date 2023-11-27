@@ -245,11 +245,14 @@ public class IMAP extends SocketClient {
      * @throws IOException
      */
     private void getReply(final boolean wantTag) throws IOException {
+
+        String unexpectedCloseString = "Connection closed without indication.";
+
         replyLines.clear();
         String line = _reader.readLine();
 
         if (line == null) {
-            throw new EOFException("Connection closed without indication.");
+            throw new EOFException(unexpectedCloseString);
         }
 
         replyLines.add(line);
@@ -261,7 +264,7 @@ public class IMAP extends SocketClient {
                 while (literalCount >= 0) {
                     line = _reader.readLine();
                     if (line == null) {
-                        throw new EOFException("Connection closed without indication.");
+                        throw new EOFException(unexpectedCloseString);
                     }
                     replyLines.add(line);
                     literalCount -= line.length() + 2; // Allow for CRLF
@@ -278,7 +281,7 @@ public class IMAP extends SocketClient {
                 }
                 line = _reader.readLine(); // get next chunk or final tag
                 if (line == null) {
-                    throw new EOFException("Connection closed without indication.");
+                    throw new EOFException(unexpectedCloseString);
                 }
                 replyLines.add(line);
             }

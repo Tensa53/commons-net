@@ -84,6 +84,6 @@ public class OS2FTPEntryParserTest extends AbstractFTPParseTest {
 
     @Override
     public void testRecentPrecision() {
-        // Not needed
+        assertTrue(true);// Not needed
     }
 }
