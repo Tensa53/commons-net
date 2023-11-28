@@ -191,12 +191,13 @@ public class TFTP extends DatagramSocketClient {
         final DatagramPacket datagram = new DatagramPacket(new byte[PACKET_SIZE], PACKET_SIZE);
         final Duration to = getSoTimeoutDuration();
         setSoTimeout(Duration.ofMillis(1));
-        try {
-            while (true) {
+        while (true) {
+            try {
                 checkOpen().receive(datagram);
+            } catch (final SocketException | InterruptedIOException e) {
+                // Do nothing. We timed out, so we hope we're caught up.
+                break;
             }
-        } catch (final SocketException | InterruptedIOException e) {
-            // Do nothing. We timed out, so we hope we're caught up.
         }
         setSoTimeout(to);
     }
