@@ -17,6 +17,7 @@
 
 package org.apache.commons.net.examples.mail;
 
+
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -375,14 +376,17 @@ public final class IMAPExportMbox {
         }
     }
 
-    private static void fetchLoop(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
+    private static void fetchLoop(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence,
+                                  String sequenceSet, String itemNames) throws IOException {
         while (true) {
-            if(!manageFetch(imap, retryWaitSecs, mboxListener, checkSequence, sequenceSet, itemNames))
+            if(!manageFetch(imap, retryWaitSecs, mboxListener, checkSequence, sequenceSet, itemNames)) {
                 break;
+            }
         }
     }
 
-    private static void finallyFetch(boolean printHash, MboxListener mboxListener, IMAPClient imap) throws IOException {
+    private static void finallyFetch(boolean printHash, MboxListener mboxListener,
+                                     IMAPClient imap) throws IOException {
         if (printHash) {
             System.err.println();
         }
@@ -404,7 +408,8 @@ public final class IMAPExportMbox {
         }
     }
 
-    private static boolean manageFetch(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
+    private static boolean manageFetch(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener,
+                                       boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
         final boolean ok = imap.fetch(sequenceSet, itemNames);
         // If the fetch failed, can we retry?
 
