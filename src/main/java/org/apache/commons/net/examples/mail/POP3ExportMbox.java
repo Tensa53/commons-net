@@ -57,10 +57,9 @@ public final class POP3ExportMbox {
         }
 
         final int argCount = args.length - argIdx;
-        if (argCount < 3) {
-            System.err.println("Usage: POP3Mail [-F file/directory] <server[:port]> <user> <password|-|*|VARNAME> [TLS [true=implicit]]");
-            System.exit(1);
-        }
+
+        //method created to reduce cognitive complexity
+        checkArgLesserThanThree(argCount);
 
         final String[] arg0 = args[argIdx++].split(":");
         final String server = arg0[0];
@@ -74,17 +73,14 @@ public final class POP3ExportMbox {
             return;
         }
 
-        final String proto = argCount > 3 ? args[argIdx++] : null;
-        final boolean implicit = argCount > 4 && Boolean.parseBoolean(args[argIdx++]);
+        //method created to reduce cognitive complexity
+        final String proto = getProtoString(argCount,args,argIdx);
 
-        final POP3Client pop3;
+        //method created to reduce cognitive complexity
+        final boolean implicit = getImplicitBool(argCount,args,argIdx);
 
-        if (proto != null) {
-            System.out.println("Using secure protocol: " + proto);
-            pop3 = new POP3SClient(proto, implicit);
-        } else {
-            pop3 = new POP3Client();
-        }
+        //method created to reduce cognitive complexity
+        final POP3Client pop3 = getPop3ClientbyProto(proto,implicit);
 
         final int port;
         if (arg0.length == 2) {
@@ -126,29 +122,62 @@ public final class POP3ExportMbox {
                 System.out.println("Getting messages: " + count);
                 final File mbox = new File(file);
                 if (mbox.isDirectory()) {
-                    System.out.println("Writing dir: " + mbox);
-                    // Currently POP3Client uses iso-8859-1
-                    for (int i = 1; i <= count; i++) {
-                        try (final OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(new File(mbox, i + ".eml")),
-                                StandardCharsets.ISO_8859_1)) {
-                            writeFile(pop3, fw, i);
-                        }
-                    }
+                    //method created to reduce cognitive complexity
+                    writingDir(mbox, pop3, count);
                 } else {
-                    System.out.println("Writing file: " + mbox);
-                    // Currently POP3Client uses iso-8859-1
-                    try (final OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(mbox), StandardCharsets.ISO_8859_1)) {
-                        for (int i = 1; i <= count; i++) {
-                            writeMbox(pop3, fw, i);
-                        }
-                    }
+                    //method created to reduce cognitive complexity
+                    writingFile(mbox, pop3, count);
                 }
             }
-
             pop3.logout();
             pop3.disconnect();
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    private static void writingFile(File mbox, POP3Client pop3, int count) throws IOException {
+        System.out.println("Writing file: " + mbox);
+        // Currently POP3Client uses iso-8859-1
+        try (final OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(mbox), StandardCharsets.ISO_8859_1)) {
+            for (int i = 1; i <= count; i++) {
+                writeMbox(pop3, fw, i);
+            }
+        }
+    }
+
+    private static void writingDir(File mbox, POP3Client pop3, int count) throws IOException {
+        System.out.println("Writing dir: " + mbox);
+        // Currently POP3Client uses iso-8859-1
+        for (int i = 1; i <= count; i++) {
+            try (final OutputStreamWriter fw = new OutputStreamWriter(new FileOutputStream(new File(mbox, i + ".eml")),
+                    StandardCharsets.ISO_8859_1)) {
+                writeFile(pop3, fw, i);
+            }
+        }
+    }
+
+    private static POP3Client getPop3ClientbyProto(String proto, boolean implicit) {
+        if (proto != null) {
+            System.out.println("Using secure protocol: " + proto);
+            return new POP3SClient(proto, implicit);
+        } else {
+            return new POP3Client();
+        }
+    }
+
+    private static boolean getImplicitBool(int argCount, String[] args, int argIdx) {
+        return argCount > 4 && Boolean.parseBoolean(args[argIdx++]);
+    }
+
+    private static String getProtoString(int argCount, String[] args, int argIdx) {
+        return argCount > 3 ? args[argIdx++] : null;
+    }
+
+    private static void checkArgLesserThanThree(int argCount) {
+        if (argCount < 3) {
+            System.err.println("Usage: POP3Mail [-F file/directory] <server[:port]> <user> <password|-|*|VARNAME> [TLS [true=implicit]]");
+            System.exit(1);
         }
     }
 

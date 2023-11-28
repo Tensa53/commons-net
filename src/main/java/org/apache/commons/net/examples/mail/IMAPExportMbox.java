@@ -17,11 +17,7 @@
 
 package org.apache.commons.net.examples.mail;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.UncheckedIOException;
+import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.ParseException;
@@ -261,83 +257,66 @@ public final class IMAPExportMbox {
 
         final int argCount = args.length - argIdx;
 
-        if (argCount < 2) {
-            System.err.println("Usage: IMAPExportMbox [-LF|-CRLF] [-c n] [-r n] [-R n] [-.] [-X]"
-                    + " imap[s]://user:password@host[:port]/folder/path [+|-]<mboxfile> [sequence-set] [itemnames]");
-            System.err.println("\t-LF | -CRLF set end-of-line to LF or CRLF (default is the line.separator system property)");
-            System.err.println("\t-c connect timeout in seconds (default 10)");
-            System.err.println("\t-r read timeout in seconds (default 10)");
-            System.err.println("\t-R temporary failure retry wait in seconds (default 0; i.e. disabled)");
-            System.err.println("\t-. print a . for each complete message received");
-            System.err.println("\t-X print the X-IMAP line for each complete message received");
-            System.err.println("\tthe mboxfile is where the messages are stored; use '-' to write to standard output.");
-            System.err.println("\tPrefix file name with '+' to append to the file. Prefix with '-' to allow overwrite.");
-            System.err.println("\ta sequence-set is a list of numbers/number ranges e.g. 1,2,3-10,20:* - default 1:*");
-            System.err.println("\titemnames are the message data item name(s) e.g. BODY.PEEK[HEADER.FIELDS (SUBJECT)]"
-                    + " or a macro e.g. ALL - default (INTERNALDATE BODY.PEEK[])");
-            System.exit(1);
-        }
+        //method created to reduce cognitive complexity
+        isArgumentCountLesserThanTwo(argCount);
 
         final String uriString = args[argIdx++];
-        URI uri;
-        try {
-            uri = URI.create(uriString);
-        } catch (final IllegalArgumentException e) { // cannot parse the path as is; let's pull it apart and try again
-            final Matcher m = Pattern.compile("(imaps?://[^/]+)(/.*)").matcher(uriString);
-            if (!m.matches()) {
-                throw e;
-            }
-            uri = URI.create(m.group(1)); // Just the scheme and auth parts
-            uri = new URI(uri.getScheme(), uri.getAuthority(), m.group(2), null, null);
-        }
+
+        //method created to reduce cognitive complexity
+        URI uri = createURI(uriString);
+
         final String file = args[argIdx++];
         String sequenceSet = argCount > 2 ? args[argIdx++] : "1:*";
         final String itemNames;
-        // Handle 0, 1 or multiple item names
-        if (argCount > 3) {
-            if (argCount > 4) {
-                final StringBuilder sb = new StringBuilder();
-                sb.append("(");
-                for (int i = 4; i <= argCount; i++) {
-                    if (i > 4) {
-                        sb.append(" ");
-                    }
-                    sb.append(args[argIdx++]);
-                }
-                sb.append(")");
-                itemNames = sb.toString();
-            } else {
-                itemNames = args[argIdx++];
-            }
-        } else {
-            itemNames = "(INTERNALDATE BODY.PEEK[])";
-        }
+
+        //method created to reduce cognitive complexity
+        itemNames = buildItemNameString(argCount, args, argIdx);
 
         final boolean checkSequence = sequenceSet.matches("\\d+:(\\d+|\\*)"); // are we expecting a sequence?
         final MboxListener mboxListener;
-        if (file.equals("-")) {
-            mboxListener = null;
-        } else if (file.startsWith("+")) {
-            final File mbox = new File(file.substring(1));
-            System.out.println("Appending to file " + mbox);
-            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, true)), eol, printHash, printMarker, checkSequence);
-        } else if (file.startsWith("-")) {
-            final File mbox = new File(file.substring(1));
-            System.out.println("Writing to file " + mbox);
-            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, false)), eol, printHash, printMarker, checkSequence);
-        } else {
-            final File mboxFile = new File(file);
-            if (mboxFile.exists() && mboxFile.length() > 0) {
-                throw new IOException("mailbox file: " + mboxFile + " already exists and is non-empty!");
-            }
-            System.out.println("Creating file " + mboxFile);
-            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mboxFile)), eol, printHash, printMarker, checkSequence);
+
+
+        switch (file){
+            case "-":
+                mboxListener = null;
+                break;
+            case "+":
+                final File mbox = new File(file.substring(1));
+                System.out.println("Appending to file " + mbox);
+                mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, true)), eol, printHash, printMarker, checkSequence);
+                break;
+            default:
+                final File mboxFile = new File(file);
+                isMboxFileExistent(mboxFile);
+                System.out.println("Creating file " + mboxFile);
+                mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mboxFile)), eol, printHash, printMarker, checkSequence);
+                break;
         }
 
+//        if (file.equals("-")) {
+//            mboxListener = null;
+//        } else if (file.startsWith("+")) {
+//            final File mbox = new File(file.substring(1));
+//            System.out.println("Appending to file " + mbox);
+//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, true)), eol, printHash, printMarker, checkSequence);
+//        } else if (file.startsWith("-")) {
+//            final File mbox = new File(file.substring(1));
+//            System.out.println("Writing to file " + mbox);
+//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, false)), eol, printHash, printMarker, checkSequence);
+//        } else {
+//            final File mboxFile = new File(file);
+//            if (isMboxFileExistent(mboxFile)) {
+//                throw new IOException("mailbox file: " + mboxFile + " already exists and is non-empty!");
+//            }
+//            System.out.println("Creating file " + mboxFile);
+//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mboxFile)), eol, printHash, printMarker, checkSequence);
+//        }
+
         final String path = uri.getPath();
-        if (path == null || path.length() < 1) {
-            throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
-        }
+
+        //method created to reduce cognitive complexity
+        isPathNull(path);
+
         final String folder = path.substring(1); // skip the leading /
 
         // suppress login details
@@ -359,76 +338,198 @@ public final class IMAPExportMbox {
 
             imap.setSoTimeout(read_timeout * 1000);
 
-            if (!imap.select(folder)) {
-                throw new IOException("Could not select folder: " + folder);
-            }
+            //method created to reduce cognitive complexity
+            selectableFolder(imap, folder);
 
-            for (final String line : imap.getReplyStrings()) {
-                maxIndexInFolder = matches(line, PATEXISTS, 1);
-                if (maxIndexInFolder != null) {
-                    break;
-                }
-            }
+            //method created to reduce cognitive complexity
+            matchImapReplyStrings(imap, maxIndexInFolder);
 
-            if (mboxListener != null) {
-                imap.setChunkListener(mboxListener);
-            } // else the command listener displays the full output without processing
+            //method created to reduce cognitive complexity
+            setChunkListenerifmboxListenerisNull(imap, mboxListener);
 
-            while (true) {
-                final boolean ok = imap.fetch(sequenceSet, itemNames);
-                // If the fetch failed, can we retry?
-                if (ok || retryWaitSecs <= 0 || mboxListener == null || !checkSequence) {
-                    break;
-                }
-                final String replyString = imap.getReplyString(); // includes EOL
-                if (!startsWith(replyString, PATTEMPFAIL)) {
-                    throw new IOException("FETCH " + sequenceSet + " " + itemNames + " failed with " + replyString);
-                }
-                System.err.println("Temporary error detected, will retry in " + retryWaitSecs + "seconds");
-                sequenceSet = mboxListener.lastSeq + 1 + ":*";
-                try {
-                    Thread.sleep(retryWaitSecs * 1000);
-                } catch (final InterruptedException e) {
-                    // ignored
-                }
-            }
+            //method created to reduce cognitive complexity
+            fetchLoop(imap, retryWaitSecs, mboxListener, checkSequence, sequenceSet, itemNames);
 
         } catch (final IOException ioe) {
-            final String count = mboxListener == null ? "?" : mboxListener.total.toString();
-            System.err.println("FETCH " + sequenceSet + " " + itemNames + " failed after processing " + count + " complete messages ");
-            if (mboxListener != null) {
-                System.err.println("Last complete response seen: " + mboxListener.lastFetched);
-            }
+            handleFetchFail(mboxListener, itemNames, sequenceSet);
+
             throw ioe;
         } finally {
-
-            if (printHash) {
-                System.err.println();
-            }
-
-            if (mboxListener != null) {
-                mboxListener.close();
-                final Iterator<String> missingIds = mboxListener.missingIds.iterator();
-                if (missingIds.hasNext()) {
-                    final StringBuilder sb = new StringBuilder();
-                    for (;;) {
-                        sb.append(missingIds.next());
-                        if (!missingIds.hasNext()) {
-                            break;
-                        }
-                        sb.append(",");
-                    }
-                    System.err.println("*** Missing ids: " + sb.toString());
-                }
-            }
+            finallyFetch(printHash, mboxListener, imap);
             imap.logout();
             imap.disconnect();
         }
+
+        //method created to reduce cognitive complexity
+        printProcessedMessages(mboxListener);
+
+        //method created to reduce cognitive complexity
+        printFolderContainedMessages(mboxListener, maxIndexInFolder);
+    }
+
+    private static URI createURI(String uriString) throws URISyntaxException {
+        try {
+            return URI.create(uriString);
+        } catch (final IllegalArgumentException e) {// cannot parse the path as is; let's pull it apart and try again
+            return parsePath(uriString);
+        }
+    }
+
+    private static void fetchLoop(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
+        while (true) {
+            if(!manageFetch(imap, retryWaitSecs, mboxListener, checkSequence, sequenceSet, itemNames))
+                break;
+        }
+    }
+
+    private static void finallyFetch(boolean printHash, MboxListener mboxListener, IMAPClient imap) throws IOException {
+        if (printHash) {
+            System.err.println();
+        }
+
+        if (mboxListener != null) {
+            mboxListener.close();
+            final Iterator<String> missingIds = mboxListener.missingIds.iterator();
+            if (missingIds.hasNext()) {
+                final StringBuilder sb = new StringBuilder();
+                for (;;) {
+                    sb.append(missingIds.next());
+                    if (!missingIds.hasNext()) {
+                        break;
+                    }
+                    sb.append(",");
+                }
+                System.err.println("*** Missing ids: " + sb.toString());
+            }
+        }
+    }
+
+    private static boolean manageFetch(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
+        final boolean ok = imap.fetch(sequenceSet, itemNames);
+        // If the fetch failed, can we retry?
+
+        if (isaBoolean(ok, retryWaitSecs, mboxListener, checkSequence)) {
+            return false;
+        }
+        final String replyString = imap.getReplyString(); // includes EOL
+        if (!startsWith(replyString, PATTEMPFAIL)) {
+            throw new IOException("FETCH " + sequenceSet + " " + itemNames + " failed with " + replyString);
+        }
+        System.err.println("Temporary error detected, will retry in " + retryWaitSecs + "seconds");
+        sequenceSet = mboxListener.lastSeq + 1 + ":*";
+        try {
+            Thread.sleep(retryWaitSecs * 1000);
+        } catch (final InterruptedException e) {
+            // ignored
+        }
+
+        return true;
+    }
+
+    private static void matchImapReplyStrings(IMAPClient imap, String maxIndexInFolder) {
+        for (final String line : imap.getReplyStrings()) {
+            maxIndexInFolder = matches(line, PATEXISTS, 1);
+            if (maxIndexInFolder != null) {
+                break;
+            }
+        }
+    }
+
+    private static void setChunkListenerifmboxListenerisNull(IMAPClient imap, MboxListener mboxListener) {
+        if (mboxListener != null) {
+            imap.setChunkListener(mboxListener);
+        } // else the command listener displays the full output without processing
+    }
+
+    private static void selectableFolder(IMAPClient imap, String folder) throws IOException {
+        if (!imap.select(folder)) {
+            throw new IOException("Could not select folder: " + folder);
+        }
+    }
+
+    private static void handleFetchFail(MboxListener mboxListener, String itemNames, String sequenceSet) {
+        final String count = mboxListener == null ? "?" : mboxListener.total.toString();
+        System.err.println("FETCH " + sequenceSet + " " + itemNames + " failed after processing " + count + " complete messages ");
+        if (mboxListener != null) {
+            System.err.println("Last complete response seen: " + mboxListener.lastFetched);
+        }
+    }
+
+    private static boolean isaBoolean(boolean ok, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence) {
+        return ok || retryWaitSecs <= 0 || mboxListener == null || !checkSequence;
+    }
+
+    private static void printFolderContainedMessages(MboxListener mboxListener, String maxIndexInFolder) {
+        if (maxIndexInFolder != null) {
+            System.out.println("Folder contained " + maxIndexInFolder + " messages.");
+        }
+    }
+
+    private static void printProcessedMessages(MboxListener mboxListener) {
         if (mboxListener != null) {
             System.out.println("Processed " + mboxListener.total + " messages.");
         }
-        if (maxIndexInFolder != null) {
-            System.out.println("Folder contained " + maxIndexInFolder + " messages.");
+    }
+
+    private static void isMboxFileExistent(File mboxFile) throws IOException {
+        if(mboxFile.exists() && mboxFile.length() > 0){
+            throw new IOException("mailbox file: " + mboxFile + " already exists and is non-empty!");
+        }
+    }
+
+    private static void isPathNull(String path) {
+        if (path == null || path.length() < 1) {
+            throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
+        }
+    }
+
+    private static String buildItemNameString(int argCount, String[] args, int argIdx) {
+        // Handle 0, 1 or multiple item names
+        if (argCount > 3) {
+            if (argCount > 4) {
+                final StringBuilder sb = new StringBuilder();
+                sb.append("(");
+                for (int i = 4; i <= argCount; i++) {
+                    if (i > 4) {
+                        sb.append(" ");
+                    }
+                    sb.append(args[argIdx++]);
+                }
+                sb.append(")");
+                return sb.toString();
+            } else {
+                return args[argIdx++];
+            }
+        } else {
+            return "(INTERNALDATE BODY.PEEK[])";
+        }
+    }
+
+    private static URI parsePath(String uriString) throws URISyntaxException {
+        final Matcher m = Pattern.compile("(imaps?://[^/]+)(/.*)").matcher(uriString);
+        if (!m.matches()) {
+            throw new IllegalArgumentException();
+        }
+        URI uri = URI.create(m.group(1)); // Just the scheme and auth parts
+        return new URI(uri.getScheme(), uri.getAuthority(), m.group(2), null, null);
+    }
+
+    private static void isArgumentCountLesserThanTwo(int argCount) {
+        if (argCount < 2) {
+            System.err.println("Usage: IMAPExportMbox [-LF|-CRLF] [-c n] [-r n] [-R n] [-.] [-X]"
+                    + " imap[s]://user:password@host[:port]/folder/path [+|-]<mboxfile> [sequence-set] [itemnames]");
+            System.err.println("\t-LF | -CRLF set end-of-line to LF or CRLF (default is the line.separator system property)");
+            System.err.println("\t-c connect timeout in seconds (default 10)");
+            System.err.println("\t-r read timeout in seconds (default 10)");
+            System.err.println("\t-R temporary failure retry wait in seconds (default 0; i.e. disabled)");
+            System.err.println("\t-. print a . for each complete message received");
+            System.err.println("\t-X print the X-IMAP line for each complete message received");
+            System.err.println("\tthe mboxfile is where the messages are stored; use '-' to write to standard output.");
+            System.err.println("\tPrefix file name with '+' to append to the file. Prefix with '-' to allow overwrite.");
+            System.err.println("\ta sequence-set is a list of numbers/number ranges e.g. 1,2,3-10,20:* - default 1:*");
+            System.err.println("\titemnames are the message data item name(s) e.g. BODY.PEEK[HEADER.FIELDS (SUBJECT)]"
+                    + " or a macro e.g. ALL - default (INTERNALDATE BODY.PEEK[])");
+            System.exit(1);
         }
     }
 

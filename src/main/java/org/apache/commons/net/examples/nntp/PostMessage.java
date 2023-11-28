@@ -107,11 +107,13 @@ public final class PostMessage {
 
             references = stdin.readLine();
 
-            if (organization != null && !organization.isEmpty()) {
+            //method created to reduce cognitive complexity
+            if (isOrganizationEmptyNull(organization)) {
                 header.addHeaderField("Organization", organization);
             }
 
-            if (references != null && !references.isEmpty()) {
+            //method created to reduce cognitive complexity
+            if (isReferencesEmptyNull(references)) {
                 header.addHeaderField("References", references);
             }
 
@@ -160,5 +162,13 @@ public final class PostMessage {
             e.printStackTrace();
             System.exit(1);
         }
+    }
+
+    private static boolean isReferencesEmptyNull(String references) {
+        return references != null && !references.isEmpty();
+    }
+
+    private static boolean isOrganizationEmptyNull(String organization) {
+        return organization != null && !organization.isEmpty();
     }
 }
