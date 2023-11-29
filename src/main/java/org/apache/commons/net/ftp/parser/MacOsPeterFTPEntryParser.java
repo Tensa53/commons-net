@@ -101,105 +101,118 @@ public class MacOsPeterFTPEntryParser extends ConfigurableFTPFileEntryParserImpl
      */
     @Override
     public FTPFile parseFTPEntry(final String entry) {
-        final FTPFile file = new FTPFile();
-        file.setRawListing(entry);
+        final FTPFile file;
         final int type;
         boolean isDevice = false;
 
         if (matches(entry)) {
-            final String typeStr = group(1);
-            final String hardLinkCount = "0";
-            final String filesize = group(20);
-            final String datestr = group(21) + " " + group(22);
-            String name = group(23);
-            final String endtoken = group(24);
-
             try {
-                file.setTimestamp(super.parseTimestamp(datestr));
-            } catch (final ParseException e) {
-                // intentionally do nothing
+                //method created to reduce cognitive complexity
+                file =  getFtpFile(isDevice);
+                file.setRawListing(entry);
+                return file;
+            } catch (ParseException e) {
+                //intentionally do nothing
             }
+        }
 
-            // A 'whiteout' file is an ARTIFICIAL entry in any of several types of
-            // 'translucent' filesystems, of which a 'union' filesystem is one.
+        return null;
+    }
 
-            // bcdelfmpSs-
-            switch (typeStr.charAt(0)) {
-            case 'd':
-                type = FTPFile.DIRECTORY_TYPE;
-                break;
-            case 'e': // NET-39 => z/OS external link
-                type = FTPFile.SYMBOLIC_LINK_TYPE;
-                break;
-            case 'l':
-                type = FTPFile.SYMBOLIC_LINK_TYPE;
-                break;
-            case 'b':
-            case 'c':
-                isDevice = true;
-                type = FTPFile.FILE_TYPE; // TODO change this if DEVICE_TYPE implemented
-                break;
-            case 'f':
-            case '-':
-                type = FTPFile.FILE_TYPE;
-                break;
-            default: // e.g. ? and w = whiteout
-                type = FTPFile.UNKNOWN_TYPE;
-            }
+    private FTPFile getFtpFile(boolean isDevice) throws ParseException {
+        final FTPFile file = new FTPFile();
+        final int type;
+        final String typeStr = group(1);
+        final String hardLinkCount = "0";
+        final String filesize = group(20);
+        final String datestr = group(21) + " " + group(22);
+        String name = group(23);
+        final String endtoken = group(24);
 
-            file.setType(type);
+        file.setTimestamp(super.parseTimestamp(datestr));
 
-            int g = 4;
-            for (int access = 0; access < 3; access++, g += 4) {
-                // Use != '-' to avoid having to check for suid and sticky bits
-                file.setPermission(access, FTPFile.READ_PERMISSION, !group(g).equals("-"));
-                file.setPermission(access, FTPFile.WRITE_PERMISSION, !group(g + 1).equals("-"));
+        // A 'whiteout' file is an ARTIFICIAL entry in any of several types of
+        // 'translucent' filesystems, of which a 'union' filesystem is one.
 
-                final String execPerm = group(g + 2);
-                file.setPermission(access, FTPFile.EXECUTE_PERMISSION, !execPerm.equals("-") && !Character.isUpperCase(execPerm.charAt(0)));
-            }
+        // bcdelfmpSs-
+        switch (typeStr.charAt(0)) {
+        case 'd':
+            type = FTPFile.DIRECTORY_TYPE;
+            break;
+        case 'e': // NET-39 => z/OS external link
+            type = FTPFile.SYMBOLIC_LINK_TYPE;
+            break;
+        case 'l':
+            type = FTPFile.SYMBOLIC_LINK_TYPE;
+            break;
+        case 'b':
+        case 'c':
+            isDevice = true;
+            type = FTPFile.FILE_TYPE; // TODO change this if DEVICE_TYPE implemented
+            break;
+        case 'f':
+        case '-':
+            type = FTPFile.FILE_TYPE;
+            break;
+        default: // e.g. ? and w = whiteout
+            type = FTPFile.UNKNOWN_TYPE;
+        }
 
-            if (!isDevice) {
-                try {
-                    file.setHardLinkCount(Integer.parseInt(hardLinkCount));
-                } catch (final NumberFormatException e) {
-                    // intentionally do nothing
-                }
-            }
+        file.setType(type);
 
-            file.setUser(null);
-            file.setGroup(null);
+        int g = 4;
+        for (int access = 0; access < 3; access++, g += 4) {
+            // Use != '-' to avoid having to check for suid and sticky bits
+            file.setPermission(access, FTPFile.READ_PERMISSION, !group(g).equals("-"));
+            file.setPermission(access, FTPFile.WRITE_PERMISSION, !group(g + 1).equals("-"));
 
+            final String execPerm = group(g + 2);
+            file.setPermission(access, FTPFile.EXECUTE_PERMISSION, isValue(execPerm));
+        }
+
+        if (!isDevice) {
             try {
-                file.setSize(Long.parseLong(filesize));
+                file.setHardLinkCount(Integer.parseInt(hardLinkCount));
             } catch (final NumberFormatException e) {
                 // intentionally do nothing
             }
-
-            if (null == endtoken) {
-                file.setName(name);
-            } else {
-                // oddball cases like symbolic links, file names
-                // with spaces in them.
-                name += endtoken;
-                if (type == FTPFile.SYMBOLIC_LINK_TYPE) {
-
-                    final int end = name.indexOf(" -> ");
-                    // Give up if no link indicator is present
-                    if (end == -1) {
-                        file.setName(name);
-                    } else {
-                        file.setName(name.substring(0, end));
-                        file.setLink(name.substring(end + 4));
-                    }
-
-                } else {
-                    file.setName(name);
-                }
-            }
-            return file;
         }
-        return null;
+
+        file.setUser(null);
+        file.setGroup(null);
+
+        try {
+            file.setSize(Long.parseLong(filesize));
+        } catch (final NumberFormatException e) {
+            // intentionally do nothing
+        }
+
+        if (null == endtoken) {
+            file.setName(name);
+        } else {
+            // oddball cases like symbolic links, file names
+            // with spaces in them.
+            name += endtoken;
+            if (type == FTPFile.SYMBOLIC_LINK_TYPE) {
+
+                final int end = name.indexOf(" -> ");
+                // Give up if no link indicator is present
+                if (end == -1) {
+                    file.setName(name);
+                } else {
+                    file.setName(name.substring(0, end));
+                    file.setLink(name.substring(end + 4));
+                }
+
+            } else {
+                file.setName(name);
+            }
+        }
+        return file;
+    }
+
+    private static boolean isValue(String execPerm) {
+        return !execPerm.equals("-") && !Character.isUpperCase(execPerm.charAt(0));
     }
 
 }

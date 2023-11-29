@@ -105,35 +105,12 @@ public final class NTPClient {
 
         final int refId = message.getReferenceId();
         String refAddr = NtpUtils.getHostAddress(refId);
-        String refName = null;
-        if (refId != 0) {
-            if (refAddr.equals("127.127.1.0")) {
-                refName = "LOCAL"; // This is the ref address for the Local Clock
-            } else if (stratum >= 2) {
-                // If reference id has 127.127 prefix then it uses its own reference clock
-                // defined in the form 127.127.clock-type.unit-num (e.g. 127.127.8.0 mode 5
-                // for GENERIC DCF77 AM; see refclock.htm from the NTP software distribution.
-                if (!refAddr.startsWith("127.127")) {
-                    try {
-                        final InetAddress addr = InetAddress.getByName(refAddr);
-                        final String name = addr.getHostName();
-                        if (name != null && !name.equals(refAddr)) {
-                            refName = name;
-                        }
-                    } catch (final UnknownHostException e) {
-                        // some stratum-2 servers sync to ref clock device but fudge stratum level higher... (e.g. 2)
-                        // ref not valid host maybe it's a reference clock name?
-                        // otherwise just show the ref IP address.
-                        refName = NtpUtils.getReferenceClock(message);
-                    }
-                }
-            } else if (version >= 3 && (stratum == 0 || stratum == 1)) {
-                refName = NtpUtils.getReferenceClock(message);
-                // refname usually have at least 3 characters (e.g. GPS, WWV, LCL, etc.)
-            }
-            // otherwise give up on naming the beast...
-        }
-        if (refName != null && refName.length() > 1) {
+
+        //method created to reduce cognitive complexity
+        String refName = getRefNameByRefId(stratum, refId, refAddr, message, version);
+
+
+        if (isRefNameNotNullAndRefNameLengthGreaterThanOne(refName)) {
             refAddr += " (" + refName + ")";
         }
         System.out.println(" Reference Identifier:\t" + refAddr);
@@ -165,6 +142,57 @@ public final class NTPClient {
         final String offset = offsetMillis == null ? "N/A" : offsetMillis.toString();
 
         System.out.println(" Roundtrip delay(ms)=" + delay + ", clock offset(ms)=" + offset); // offset in ms
+    }
+
+    private static String getRefNameByRefId(int stratum, int refId, String refAddr, NtpV3Packet message, int version) {
+        String refName = null;
+
+        if (refId != 0) {
+            if (refAddr.equals("127.127.1.0")) {
+                refName = "LOCAL"; // This is the ref address for the Local Clock
+            } else if (stratum >= 2) {
+                // If reference id has 127.127 prefix then it uses its own reference clock
+                // defined in the form 127.127.clock-type.unit-num (e.g. 127.127.8.0 mode 5
+                // for GENERIC DCF77 AM; see refclock.htm from the NTP software distribution.
+                if (!refAddr.startsWith("127.127")) {
+                    try {
+                        //method created to reduce cognitive complexity
+                        refName = getRefNameByRefAddrAndHostname(refAddr);
+                    } catch (final UnknownHostException e) {
+                        // some stratum-2 servers sync to ref clock device but fudge stratum level higher... (e.g. 2)
+                        // ref not valid host maybe it's a reference clock name?
+                        // otherwise just show the ref IP address.
+                        refName = NtpUtils.getReferenceClock(message);
+                    }
+                }
+
+            } else if (isVersionGreaterThanEqualsThreeAndStratumEqualsZeroOne(version, stratum)) {
+                refName = NtpUtils.getReferenceClock(message);
+                // refname usually have at least 3 characters (e.g. GPS, WWV, LCL, etc.)
+            }
+            // otherwise give up on naming the beast...
+        }
+
+        return refName;
+    }
+
+    private static String getRefNameByRefAddrAndHostname(String refAddr) throws UnknownHostException {
+        final InetAddress addr = InetAddress.getByName(refAddr);
+        final String name = addr.getHostName();
+
+        if (name != null && !name.equals(refAddr)){
+            return name;
+        } else {
+            return null;
+        }
+    }
+
+    private static boolean isRefNameNotNullAndRefNameLengthGreaterThanOne(String refName) {
+        return refName != null && refName.length() > 1;
+    }
+
+    private static boolean isVersionGreaterThanEqualsThreeAndStratumEqualsZeroOne(int version, int stratum) {
+        return version >= 3 && (stratum == 0 || stratum == 1);
     }
 
 }
