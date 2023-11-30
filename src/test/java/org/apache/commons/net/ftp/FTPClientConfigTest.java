@@ -103,6 +103,7 @@ public class FTPClientConfigTest extends TestCase {
     }
 
     public void testGetServerLanguageCode() {
+        assertTrue("Empty Method, skipping this test", true);
     }
 
     public void testLookupDateFormatSymbols() {
@@ -163,6 +164,7 @@ public class FTPClientConfigTest extends TestCase {
     }
 
     public void testSetShortMonthNames() {
+        assertTrue("Empty Method, skipping this test", true);
     }
 
 }

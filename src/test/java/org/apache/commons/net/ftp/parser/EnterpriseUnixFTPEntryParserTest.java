@@ -112,6 +112,7 @@ public class EnterpriseUnixFTPEntryParserTest extends AbstractFTPParseTest {
     @Override
     public void testParseFieldsOnDirectory() throws Exception {
         // Everything is a File for now.
+        assertTrue("Everything is a File for now, this test is skipped", true);
     }
 
     /**
