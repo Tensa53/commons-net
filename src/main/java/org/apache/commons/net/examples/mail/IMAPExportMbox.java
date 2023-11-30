@@ -117,6 +117,7 @@ public final class IMAPExportMbox {
             Matcher m = PATID.matcher(firstLine);
             if (m.lookingAt()) { // found a match
                 final String date = m.group(PATID_DATE_GROUP);
+
                 try {
                     received = IDPARSE.parse(date);
                 } catch (final ParseException e) {
@@ -125,23 +126,11 @@ public final class IMAPExportMbox {
             } else {
                 System.err.println("No timestamp found in: " + firstLine + "  - using current time");
             }
-            String replyTo = "MAILER-DAEMON"; // default
+
+            String replyTo = null;
             for (int i = 1; i < replyStrings.length - 1; i++) {
                 final String line = replyStrings[i];
-                if (line.startsWith("Return-Path: ")) {
-                    final String[] parts = line.split(" ", 2);
-                    if (!parts[1].equals("<>")) {// Don't replace default with blank
-                        replyTo = parts[1];
-                        if (replyTo.startsWith("<")) {
-                            if (replyTo.endsWith(">")) {
-                                replyTo = replyTo.substring(1, replyTo.length() - 1); // drop <> wrapper
-                            } else {
-                                System.err.println("Unexpected Return-path: '" + line + "' in " + firstLine);
-                            }
-                        }
-                    }
-                    break;
-                }
+                replyTo = getReplyToByLineStartsWith(line, firstLine);
             }
             try {
                 // Add initial mbox header line
@@ -152,9 +141,9 @@ public final class IMAPExportMbox {
                 bufferedWriter.append(lineSeparator);
                 // Debug
                 bufferedWriter.append("X-IMAP-Response: ").append(firstLine).append(lineSeparator);
-                if (printMarker) {
-                    System.err.println("[" + total + "] " + firstLine);
-                }
+
+                ifPrintMarker(printMarker, firstLine);
+
                 // Skip first and last lines
                 for (int i = 1; i < replyStrings.length - 1; i++) {
                     final String line = replyStrings[i];
@@ -180,24 +169,61 @@ public final class IMAPExportMbox {
             total.incrementAndGet();
             if (checkSequence) {
                 m = PATSEQ.matcher(firstLine);
-                if (m.lookingAt()) { // found a match
-                    final long msgSeq = Long.parseLong(m.group(PATSEQ_SEQUENCE_GROUP)); // Cannot fail to parse
-                    if (lastSeq != -1) {
-                        final long missing = msgSeq - lastSeq - 1;
-                        if (missing != 0) {
-                            for (long j = lastSeq + 1; j < msgSeq; j++) {
-                                missingIds.add(String.valueOf(j));
-                            }
-                            System.err.println("*** Sequence error: current=" + msgSeq + " previous=" + lastSeq + " Missing=" + missing);
-                        }
-                    }
-                    lastSeq = msgSeq;
-                }
+                matchCheckSequence(m);
             }
+
+            ifPrintHash(printHash);
+
+            return true;
+        }
+
+        private void matchCheckSequence(Matcher m) {
+            if (m.lookingAt()) { // found a match
+                final long msgSeq = Long.parseLong(m.group(PATSEQ_SEQUENCE_GROUP)); // Cannot fail to parse
+                if (lastSeq != -1) {
+                    final long missing = msgSeq - lastSeq - 1;
+                    if (missing != 0) {
+                        for (long j = lastSeq + 1; j < msgSeq; j++) {
+                            missingIds.add(String.valueOf(j));
+                        }
+                        System.err.println("*** Sequence error: current=" + msgSeq + " previous=" + lastSeq + " Missing=" + missing);
+                    }
+                }
+                lastSeq = msgSeq;
+            }
+        }
+
+        private void ifPrintMarker(boolean printMarker, String firstLine) {
+            if (printMarker) {
+                System.err.println("[" + total + "] " + firstLine);
+            }
+        }
+
+        private void ifPrintHash(boolean printHash) {
             if (printHash) {
                 System.err.print(".");
             }
-            return true;
+        }
+
+        private String getReplyToByLineStartsWith(String line, String firstLine) {
+            String replyTo = "MAILER-DAEMON"; // default
+
+            if (line.startsWith("Return-Path: ")) {
+                final String[] parts = line.split(" ", 2);
+                if (!parts[1].equals("<>")) {// Don't replace default with blank
+                    replyTo = parts[1];
+                    if (replyTo.startsWith("<")) {
+                        if (replyTo.endsWith(">")) {
+                            replyTo = replyTo.substring(1, replyTo.length() - 1); // drop <> wrapper
+                        } else {
+                            System.err.println("Unexpected Return-path: '" + line + "' in " + firstLine);
+                        }
+                    }
+                }
+                return replyTo;
+            }
+
+            return replyTo;
         }
 
         public void close() throws IOException {
