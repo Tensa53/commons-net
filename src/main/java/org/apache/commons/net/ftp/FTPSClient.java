@@ -708,7 +708,8 @@ public class FTPSClient extends FTPClient {
      * @since 3.1
      */
     private Socket openDataSecureConnection(final String command, final String arg) throws IOException {
-        if (getDataConnectionMode() != ACTIVE_LOCAL_DATA_CONNECTION_MODE && getDataConnectionMode() != PASSIVE_LOCAL_DATA_CONNECTION_MODE) {
+
+        if (isNotDataConnectionModeActivateLocalAndIsNotDataConnectionModePassiveLocalData()) {
             return null;
         }
 
@@ -728,41 +729,13 @@ public class FTPSClient extends FTPClient {
                 // today's intelligent NAT Firewalls are able to
                 // substitute IP addresses in the PORT command,
                 // but might not be able to recognize the EPRT command.
-                if (isInet6Address) {
-                    if (!FTPReply.isPositiveCompletion(eprt(getReportHostAddress(), server.getLocalPort()))) {
-                        return null;
-                    }
-                } else if (!FTPReply.isPositiveCompletion(port(getReportHostAddress(), server.getLocalPort()))) {
+
+                socket = createSecureSocket(server, isInet6Address, command, arg, soTimeoutMillis);
+
+                if (socket == null){
                     return null;
                 }
 
-                if (getRestartOffset() > 0 && !restart(getRestartOffset())) {
-                    return null;
-                }
-
-                if (!FTPReply.isPositivePreliminary(sendCommand(command, arg))) {
-                    return null;
-                }
-
-                // For now, let's just use the data timeout value for waiting for
-                // the data connection. It may be desirable to let this be a
-                // separately configurable value. In any case, we really want
-                // to allow preventing the accept from blocking indefinitely.
-                if (soTimeoutMillis >= 0) {
-                    server.setSoTimeout(soTimeoutMillis);
-                }
-                socket = server.accept();
-
-                // Ensure the timeout is set before any commands are issued on the new socket
-                if (soTimeoutMillis >= 0) {
-                    socket.setSoTimeout(soTimeoutMillis);
-                }
-                if (getReceiveDataSocketBufferSize() > 0) {
-                    socket.setReceiveBufferSize(getReceiveDataSocketBufferSize());
-                }
-                if (getSendDataSocketBufferSize() > 0) {
-                    socket.setSendBufferSize(getSendDataSocketBufferSize());
-                }
             }
         } else { // We must be in PASSIVE_LOCAL_DATA_CONNECTION_MODE
 
@@ -773,51 +746,17 @@ public class FTPSClient extends FTPClient {
             // and the client is coming from another internal network.
             // In that case the data connection after PASV command would fail,
             // while EPSV would make the client succeed by taking just the port.
-            final boolean attemptEPSV = isUseEPSVwithIPv4() || isInet6Address;
-            if (attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE) {
-                _parseExtendedPassiveModeReply(_replyLines.get(0));
-            } else {
-                if (isInet6Address) {
-                    return null; // Must use EPSV for IPV6
-                }
-                // If EPSV failed on IPV4, revert to PASV
-                if (pasv() != FTPReply.ENTERING_PASSIVE_MODE) {
-                    return null;
-                }
-                _parsePassiveModeReply(_replyLines.get(0));
+            final boolean attemptEPSV = isUseEPSWithIPV4OrIsNetAddress(isInet6Address);
+
+            if(!(parseExtendedElseParsePassive(attemptEPSV, isInet6Address))){
+                return null;
             }
 
-            if (getProxy() != null) {
-                socket = new Socket(getProxy());
-            } else {
-                socket = _socketFactory_.createSocket();
-            }
+            socket = createSecureSocket(soTimeoutMillis);
 
-            if (getReceiveDataSocketBufferSize() > 0) {
-                socket.setReceiveBufferSize(getReceiveDataSocketBufferSize());
-            }
-            if (getSendDataSocketBufferSize() > 0) {
-                socket.setSendBufferSize(getSendDataSocketBufferSize());
-            }
-            if (getPassiveLocalIPAddress() != null) {
-                socket.bind(new InetSocketAddress(getPassiveLocalIPAddress(), 0));
-            }
+            sslSocket = createSecureSSLSocket(socket);
 
-            // For now, let's just use the data timeout value for waiting for
-            // the data connection. It may be desirable to let this be a
-            // separately configurable value. In any case, we really want
-            // to allow preventing the accept from blocking indefinitely.
-            if (soTimeoutMillis >= 0) {
-                socket.setSoTimeout(soTimeoutMillis);
-            }
-
-            socket.connect(new InetSocketAddress(getPassiveHost(), getPassivePort()), connectTimeout);
-
-            if (getProxy() != null) {
-                sslSocket = context.getSocketFactory().createSocket(socket, getPassiveHost(), getPassivePort(), true);
-            }
-
-            if (getRestartOffset() > 0 && !restart(getRestartOffset())) {
+            if (isResatrtOffsetGreaterThanZeroAndIsNotRestarted()) {
                 closeSockets(socket, sslSocket);
                 return null;
             }
@@ -828,7 +767,7 @@ public class FTPSClient extends FTPClient {
             }
         }
 
-        if (isRemoteVerificationEnabled() && !verifyRemote(socket)) {
+        if (isRemoteVerificationEnableAndNotVerifiedRemote(socket)) {
             // Grab the host before we close the socket to avoid NET-663
             final InetAddress socketHost = socket.getInetAddress();
 
@@ -839,6 +778,124 @@ public class FTPSClient extends FTPClient {
         }
 
         return getProxy() != null ? sslSocket : socket;
+    }
+
+    private Socket createSecureSSLSocket(Socket socket) throws IOException {
+        Socket sslSocket = null;
+
+        if (getProxy() != null) {
+            sslSocket = context.getSocketFactory().createSocket(socket, getPassiveHost(), getPassivePort(), true);
+        }
+        return sslSocket;
+    }
+
+    private Socket createSecureSocket(int soTimeoutMillis) throws IOException {
+        final Socket socket;
+        if (getProxy() != null) {
+            socket = new Socket(getProxy());
+        } else {
+            socket = _socketFactory_.createSocket();
+        }
+
+        if (getReceiveDataSocketBufferSize() > 0) {
+            socket.setReceiveBufferSize(getReceiveDataSocketBufferSize());
+        }
+        if (getSendDataSocketBufferSize() > 0) {
+            socket.setSendBufferSize(getSendDataSocketBufferSize());
+        }
+        if (getPassiveLocalIPAddress() != null) {
+            socket.bind(new InetSocketAddress(getPassiveLocalIPAddress(), 0));
+        }
+
+        // For now, let's just use the data timeout value for waiting for
+        // the data connection. It may be desirable to let this be a
+        // separately configurable value. In any case, we really want
+        // to allow preventing the accept from blocking indefinitely.
+        if (soTimeoutMillis >= 0) {
+            socket.setSoTimeout(soTimeoutMillis);
+        }
+
+        socket.connect(new InetSocketAddress(getPassiveHost(), getPassivePort()), connectTimeout);
+        return socket;
+    }
+
+    private boolean parseExtendedElseParsePassive(boolean attemptEPSV, boolean isInet6Address) throws IOException {
+        if (isAttempEPSVAndEpsbEqualsENTERING_EPSV(attemptEPSV)) {
+            _parseExtendedPassiveModeReply(_replyLines.get(0));
+        } else {
+            if (isInet6Address) {
+                return false; // Must use EPSV for IPV6
+            }
+            // If EPSV failed on IPV4, revert to PASV
+            if (pasv() != FTPReply.ENTERING_PASSIVE_MODE) {
+                return false;
+            }
+            _parsePassiveModeReply(_replyLines.get(0));
+        }
+
+        return true;
+    }
+
+    private boolean isAttempEPSVAndEpsbEqualsENTERING_EPSV(boolean attemptEPSV) throws IOException {
+        return attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE;
+    }
+
+    private boolean isUseEPSWithIPV4OrIsNetAddress(boolean isInet6Address) {
+        return isUseEPSVwithIPv4() || isInet6Address;
+    }
+
+    private boolean isRemoteVerificationEnableAndNotVerifiedRemote(Socket socket) {
+        return isRemoteVerificationEnabled() && !verifyRemote(socket);
+    }
+
+    private Socket createSecureSocket(ServerSocket server, boolean isInet6Address, String command, String arg, int soTimeoutMillis) throws IOException {
+
+        if (isInet6Address) {
+            if (!FTPReply.isPositiveCompletion(eprt(getReportHostAddress(), server.getLocalPort()))) {
+                return null;
+            }
+        } else if (!FTPReply.isPositiveCompletion(port(getReportHostAddress(), server.getLocalPort()))) {
+            return null;
+        }
+
+        if (isResatrtOffsetGreaterThanZeroAndIsNotRestarted()) {
+            return null;
+        }
+
+        if (!FTPReply.isPositivePreliminary(sendCommand(command, arg))) {
+            return null;
+        }
+
+        // For now, let's just use the data timeout value for waiting for
+        // the data connection. It may be desirable to let this be a
+        // separately configurable value. In any case, we really want
+        // to allow preventing the accept from blocking indefinitely.
+        if (soTimeoutMillis >= 0) {
+            server.setSoTimeout(soTimeoutMillis);
+        }
+
+        Socket socket = server.accept();
+
+        // Ensure the timeout is set before any commands are issued on the new socket
+        if (soTimeoutMillis >= 0) {
+            socket.setSoTimeout(soTimeoutMillis);
+        }
+        if (getReceiveDataSocketBufferSize() > 0) {
+            socket.setReceiveBufferSize(getReceiveDataSocketBufferSize());
+        }
+        if (getSendDataSocketBufferSize() > 0) {
+            socket.setSendBufferSize(getSendDataSocketBufferSize());
+        }
+
+        return socket;
+    }
+
+    private boolean isResatrtOffsetGreaterThanZeroAndIsNotRestarted() throws IOException {
+        return getRestartOffset() > 0 && !restart(getRestartOffset());
+    }
+
+    private boolean isNotDataConnectionModeActivateLocalAndIsNotDataConnectionModePassiveLocalData() {
+        return getDataConnectionMode() != ACTIVE_LOCAL_DATA_CONNECTION_MODE && getDataConnectionMode() != PASSIVE_LOCAL_DATA_CONNECTION_MODE;
     }
 
     /**
