@@ -80,7 +80,6 @@ public final class ServerToServerFTP {
         try {
             final int reply;
 
-            //method created to reduce cognitive complexity
             ftp1Connect(ftp1, port1, server1);
 
             System.out.println("Connected to " + server1 + ".");
@@ -93,7 +92,6 @@ public final class ServerToServerFTP {
                 System.exit(1);
             }
         } catch (final IOException e) {
-            //method created to reduce cognitive complexity
             checkFtp1Connection(ftp1);
             System.err.println("Could not connect to server1.");
             e.printStackTrace();
@@ -115,7 +113,6 @@ public final class ServerToServerFTP {
                 System.exit(1);
             }
         } catch (final IOException e) {
-            //method created to reduce cognitive complexity
             checkFtp2Connection(ftp2);
             System.err.println("Could not connect to server2.");
             e.printStackTrace();
@@ -161,14 +158,13 @@ public final class ServerToServerFTP {
             e.printStackTrace();
             System.exit(1);
         } finally {
-            //method created to reduce cognitive complexity
             checkFtp1ConnectionLogin(ftp1);
 
-            //method created to reduce cognitive complexity
             checkFtp2ConnectionLogin(ftp2);
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void ftp2Connect(FTPClient ftp2, String server2, int port2) throws IOException {
         if (port2 > 0) {
             ftp2.connect(server2, port2);
@@ -177,6 +173,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void ftp1Connect(FTPClient ftp1, int port1, String server1) throws IOException {
         if (port1 > 0) {
             ftp1.connect(server1, port1);
@@ -185,6 +182,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkFtp2ConnectionLogin(FTPClient ftp2) {
         try {
             if (ftp2.isConnected()) {
@@ -196,6 +194,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkFtp1ConnectionLogin(FTPClient ftp1) {
         try {
             if (ftp1.isConnected()) {
@@ -207,6 +206,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkFtp2Connection(FTPClient ftp2) {
         if (ftp2.isConnected()) {
             try {
@@ -217,6 +217,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkFtp1Connection(FTPClient ftp1) {
         if (ftp1.isConnected()) {
             try {
@@ -227,6 +228,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkArgs(String[] args) {
         if (args.length < 8) {
             System.err.println("Usage: ftp <host1> <user1> <pass1> <file1> <host2> <user2> <pass2> <file2>");
@@ -234,6 +236,7 @@ public final class ServerToServerFTP {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isTransferInitiable(FTPClient ftp1, FTPClient ftp2, String file1, String file2) throws IOException {
         return !ftp1.remoteRetrieve(file1) || !ftp2.remoteStoreUnique(file2);
     }

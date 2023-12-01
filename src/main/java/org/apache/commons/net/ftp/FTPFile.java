@@ -454,6 +454,7 @@ public class FTPFile implements Serializable {
         return sb.toString();
     }
 
+    //method created to reduce cognitive complexity
     private Calendar getTimestampByTimezone(Calendar timestamp, String timezone) {
         Calendar innerTimestamp = (Calendar) timestamp.clone();
 

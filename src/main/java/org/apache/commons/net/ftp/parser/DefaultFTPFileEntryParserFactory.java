@@ -105,7 +105,6 @@ public class DefaultFTPFileEntryParserFactory implements FTPFileEntryParserFacto
         FTPFileEntryParser parser = null;
 
         // Is the key a possible class name?
-        //method created to reduce cognitive complexity
         parser = getClassInstanceByKey(key);
 
         if (parser == null) { // Now try for aliases
@@ -144,6 +143,8 @@ public class DefaultFTPFileEntryParserFactory implements FTPFileEntryParserFacto
         }
         return parser;
     }
+
+    //method created to reduce cognitive complexity
 
     private FTPFileEntryParser getClassInstanceByKey(String key) {
         FTPFileEntryParser parser = null;

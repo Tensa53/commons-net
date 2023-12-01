@@ -39,7 +39,6 @@ public final class finger {
         InetAddress address = null;
 
         // Get flags. If an invalid flag is present, exit with usage message.
-        //method created to reduce cognitive complexity
         while (isArgLesserThanArgsLengthAndArgsStartsWith(arg, args)) {
             if (args[arg].equals("-l")) {
                 longOutput = true;
@@ -57,10 +56,8 @@ public final class finger {
         if (arg >= args.length) {
             // Finger local host
 
-            //method created to reduce cognitive complexity
             address = getLocalHostInetAddress();
 
-            //method created to reduce cognitive complexity
             fingerQuery(finger, address, longOutput);
 
             return;
@@ -95,7 +92,7 @@ public final class finger {
             }
         }
     }
-
+    //method created to reduce cognitive complexity
     private static void fingerQueryHandle(FingerClient finger, InetAddress address, boolean longOutput, String handle) {
         try {
             finger.connect(address);
@@ -107,6 +104,7 @@ public final class finger {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void fingerQuery(FingerClient finger, InetAddress address, boolean longOutput) {
         try {
             finger.connect(address);
@@ -118,6 +116,7 @@ public final class finger {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static InetAddress getLocalHostInetAddress() {
         InetAddress inetAddress = null;
 
@@ -131,6 +130,7 @@ public final class finger {
         return inetAddress;
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isArgLesserThanArgsLengthAndArgsStartsWith(int arg, String[] args) {
         return arg < args.length && args[arg].startsWith("-");
     }

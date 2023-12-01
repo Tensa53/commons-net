@@ -106,9 +106,7 @@ public final class NTPClient {
         final int refId = message.getReferenceId();
         String refAddr = NtpUtils.getHostAddress(refId);
 
-        //method created to reduce cognitive complexity
         String refName = getRefNameByRefId(stratum, refId, refAddr, message, version);
-
 
         if (isRefNameNotNullAndRefNameLengthGreaterThanOne(refName)) {
             refAddr += " (" + refName + ")";
@@ -144,6 +142,7 @@ public final class NTPClient {
         System.out.println(" Roundtrip delay(ms)=" + delay + ", clock offset(ms)=" + offset); // offset in ms
     }
 
+    //method created to reduce cognitive complexity
     private static String getRefNameByRefId(int stratum, int refId, String refAddr, NtpV3Packet message, int version) {
         String refName = null;
 
@@ -156,7 +155,6 @@ public final class NTPClient {
                 // for GENERIC DCF77 AM; see refclock.htm from the NTP software distribution.
                 if (!refAddr.startsWith("127.127")) {
                     try {
-                        //method created to reduce cognitive complexity
                         refName = getRefNameByRefAddrAndHostname(refAddr);
                     } catch (final UnknownHostException e) {
                         // some stratum-2 servers sync to ref clock device but fudge stratum level higher... (e.g. 2)
@@ -176,6 +174,7 @@ public final class NTPClient {
         return refName;
     }
 
+    //method created to reduce cognitive complexity
     private static String getRefNameByRefAddrAndHostname(String refAddr) throws UnknownHostException {
         final InetAddress addr = InetAddress.getByName(refAddr);
         final String name = addr.getHostName();
@@ -187,10 +186,12 @@ public final class NTPClient {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isRefNameNotNullAndRefNameLengthGreaterThanOne(String refName) {
         return refName != null && refName.length() > 1;
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isVersionGreaterThanEqualsThreeAndStratumEqualsZeroOne(int version, int stratum) {
         return version >= 3 && (stratum == 0 || stratum == 1);
     }

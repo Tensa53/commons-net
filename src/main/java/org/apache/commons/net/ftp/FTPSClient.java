@@ -780,6 +780,7 @@ public class FTPSClient extends FTPClient {
         return getProxy() != null ? sslSocket : socket;
     }
 
+    //method created to reduce cognitive complexity
     private Socket createSecureSSLSocket(Socket socket) throws IOException {
         Socket sslSocket = null;
 
@@ -789,6 +790,7 @@ public class FTPSClient extends FTPClient {
         return sslSocket;
     }
 
+    //method created to reduce cognitive complexity
     private Socket createSecureSocket(int soTimeoutMillis) throws IOException {
         final Socket socket;
         if (getProxy() != null) {
@@ -819,6 +821,7 @@ public class FTPSClient extends FTPClient {
         return socket;
     }
 
+    //method created to reduce cognitive complexity
     private boolean parseExtendedElseParsePassive(boolean attemptEPSV, boolean isInet6Address) throws IOException {
         if (isAttempEPSVAndEpsbEqualsENTERING_EPSV(attemptEPSV)) {
             _parseExtendedPassiveModeReply(_replyLines.get(0));
@@ -836,18 +839,22 @@ public class FTPSClient extends FTPClient {
         return true;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isAttempEPSVAndEpsbEqualsENTERING_EPSV(boolean attemptEPSV) throws IOException {
         return attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isUseEPSWithIPV4OrIsNetAddress(boolean isInet6Address) {
         return isUseEPSVwithIPv4() || isInet6Address;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isRemoteVerificationEnableAndNotVerifiedRemote(Socket socket) {
         return isRemoteVerificationEnabled() && !verifyRemote(socket);
     }
 
+    //method created to reduce cognitive complexity
     private Socket createSecureSocket(ServerSocket server, boolean isInet6Address, String command, String arg, int soTimeoutMillis) throws IOException {
 
         if (isInet6Address) {
@@ -890,10 +897,12 @@ public class FTPSClient extends FTPClient {
         return socket;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isResatrtOffsetGreaterThanZeroAndIsNotRestarted() throws IOException {
         return getRestartOffset() > 0 && !restart(getRestartOffset());
     }
 
+    //method created to reduce cognitive complexity
     private boolean isNotDataConnectionModeActivateLocalAndIsNotDataConnectionModePassiveLocalData() {
         return getDataConnectionMode() != ACTIVE_LOCAL_DATA_CONNECTION_MODE && getDataConnectionMode() != PASSIVE_LOCAL_DATA_CONNECTION_MODE;
     }

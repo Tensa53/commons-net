@@ -107,7 +107,6 @@ public class MacOsPeterFTPEntryParser extends ConfigurableFTPFileEntryParserImpl
 
         if (matches(entry)) {
             try {
-                //method created to reduce cognitive complexity
                 file =  getFtpFile(isDevice);
                 file.setRawListing(entry);
                 return file;
@@ -119,6 +118,7 @@ public class MacOsPeterFTPEntryParser extends ConfigurableFTPFileEntryParserImpl
         return null;
     }
 
+    //method created to reduce cognitive complexity
     private FTPFile getFtpFile(boolean isDevice) throws ParseException {
         final FTPFile file = new FTPFile();
         final int type;

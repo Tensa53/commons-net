@@ -282,6 +282,7 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
         return file;
     }
 
+    //method created to reduce cognitive complexity
     private FTPFile checkEntryLenght(String entry) {
         if (entry.length() > 1) { // is there a path name?
             final FTPFile file = new FTPFile();
@@ -292,14 +293,17 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
         return null; // Invalid - no pathname
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isFactnameEqualsSizeOrFactnameEqualsSizd(String factname) {
         return "size".equals(factname) || "sizd".equals(factname);
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isPartsLengthNotTwoAndPartsOneEmpty(String[] parts) {
         return parts.length != 2 || parts[1].isEmpty();
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isNotUnixModeAndPermEqualsFactname(boolean hasUnixMode, String factname) {
         return !hasUnixMode && "perm".equals(factname);
     }

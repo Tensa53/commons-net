@@ -469,6 +469,7 @@ public class FTPClient extends FTP implements Configurable {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static String parseParam(String param) {
         final StringBuilder sb = new StringBuilder();
         boolean quoteSeen = false;
@@ -762,6 +763,7 @@ public class FTPClient extends FTP implements Configurable {
         return true;
     }
 
+    //method created to reduce cognitive complexity
     private Socket createSocket(int receiveDataSocketBufferSize, int sendDataSocketBufferSize,
                                 InetAddress passiveLocalHost, int soTimeoutMillis, String command, String arg) throws IOException {
         Socket socket = _socketFactory_.createSocket();
@@ -797,6 +799,7 @@ public class FTPClient extends FTP implements Configurable {
         return socket;
     }
 
+    //method created to reduce cognitive complexity
     private Socket createSocket(boolean isInet6Address, ServerSocket server, String command, String arg, int soTimeoutMillis) throws IOException {
         if (isInet6Address) {
             if (!FTPReply.isPositiveCompletion(eprt(getReportHostAddress(), server.getLocalPort()))) {
@@ -838,22 +841,27 @@ public class FTPClient extends FTP implements Configurable {
         return socket;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isRemoteVerificationEnableAndNotVerifiedRemote(Socket socket) {
         return remoteVerificationEnabled && !verifyRemote(socket);
     }
 
+    //method created to reduce cognitive complexity
     private boolean isAttempEPSVAndEpsvEqualsENTERING_EPSV(boolean attemptEPSV) throws IOException {
         return attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isUseEPSVwithIPV4OrIsNetAddress(boolean isInet6Address) {
         return isUseEPSVwithIPv4() || isInet6Address;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isResatrtOffsetGreaterThanZeroAndIsNotRestarted() throws IOException {
         return restartOffset > 0 && !restart(restartOffset);
     }
 
+    //method created to reduce cognitive complexity
     private boolean isNotDataConnectionModeActiveLocalAndIsNotDataConnectionModePassiveLocalData() {
         return dataConnectionMode != ACTIVE_LOCAL_DATA_CONNECTION_MODE && dataConnectionMode != PASSIVE_LOCAL_DATA_CONNECTION_MODE;
     }
@@ -1283,6 +1291,7 @@ public class FTPClient extends FTP implements Configurable {
         }
     }
 
+    //method created to reduce cognitive complexity
     private void createEntryParser(String parserKey) throws IOException {
         if (null != parserKey) {
             // if a parser key was supplied in the parameters,
@@ -1320,10 +1329,12 @@ public class FTPClient extends FTP implements Configurable {
         }
     }
 
+    //method created to reduce cognitive complexity
     private boolean isConfigurationNotNullAndConfigurationServerSystemKeyLengthGreaterThanZero() {
         return null != configuration && configuration.getServerSystemKey().length() > 0;
     }
 
+    //method created to reduce cognitive complexity
     private boolean isEntyrParsenNullOrParseKeyNullOrEntryParserKeyEqualsParserKey(FTPFileEntryParser entryParser, String parserKey, String entryParserKey) {
         return entryParser == null || parserKey != null && !entryParserKey.equals(parserKey);
     }

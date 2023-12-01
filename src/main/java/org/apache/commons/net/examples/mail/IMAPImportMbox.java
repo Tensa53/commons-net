@@ -81,7 +81,6 @@ public final class IMAPImportMbox {
 
     public static void main(final String[] args) throws IOException {
 
-        //method created to reduce cognitive complexity
         checkArgsLesserThanTwo(args);
 
         final URI uri = URI.create(args[0]);
@@ -89,12 +88,10 @@ public final class IMAPImportMbox {
 
         final File mbox = new File(file);
 
-        //method created to reduce cognitive complexity
         isMboxAFileOrIsReadable(mbox);
 
         final String path = uri.getPath();
 
-        //method created to reduce cognitive complexity
         isPathNull(path);
 
         final String folder = path.substring(1); // skip the leading /
@@ -163,6 +160,7 @@ public final class IMAPImportMbox {
             System.out.println("Processed " + total + " messages, loaded " + loaded);
         }
 
+    //method created to reduce cognitive complexity
     private static int processableMessageCounterUp(String line, StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
         if (process(sb, imap, folder, total)) { // process previous message (if any)
             return 1;
@@ -171,6 +169,7 @@ public final class IMAPImportMbox {
         return 0;
     }
 
+    //method created to reduce cognitive complexity
     private static BitSet messageNumbersSetBitIndex(String entry) {
         BitSet msgNums = new BitSet();
 
@@ -188,22 +187,26 @@ public final class IMAPImportMbox {
         return msgNums;
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isWantedAndProcessable(boolean wanted, StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
         return wanted && process(sb, imap, folder, total);
     }
 
+    //method created to reduce cognitive complexity
     private static void isPathNull(String path) {
         if (path == null || path.length() < 1) {
             throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void isMboxAFileOrIsReadable(File mbox) throws IOException {
         if (!mbox.isFile() || !mbox.canRead()) {
             throw new IOException("Cannot read mailbox file: " + mbox);
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkArgsLesserThanTwo(String[] args) {
         if (args.length < 2) {
             System.err.println("Usage: IMAPImportMbox imap[s]://user:password@host[:port]/folder/path <mboxfile> [selectors]");

@@ -57,7 +57,6 @@ public class Main {
 
         if (args.length == 0) {
 
-            //method created to reduce cognitive complexity
             checkStackTrace();
 
             @SuppressWarnings("unchecked") // property names are Strings
@@ -98,6 +97,7 @@ public class Main {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void checkStackTrace() {
         if (Thread.currentThread().getStackTrace().length > 2) { // called by Maven
             System.out.println(

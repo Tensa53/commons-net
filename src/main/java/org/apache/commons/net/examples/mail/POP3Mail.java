@@ -53,7 +53,6 @@ public final class POP3Mail {
 
         final String proto = args.length > 3 ? args[3] : null;
 
-        //method created to reduce cognitive complexity
         final boolean implicit = isImplicit(args);
 
         final POP3Client pop3;
@@ -140,10 +139,12 @@ public final class POP3Mail {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isImplicit(String[] args) {
         return args.length > 4 && Boolean.parseBoolean(args[4]);
     }
 
+    //method created to reduce cognitive complexity
     private static void checkArgs(String[] args) {
         if (args.length < 3) {
             System.err.println("Usage: POP3Mail <server[:port]> <username> <password|-|*|VARNAME> [TLS [true=implicit]]");

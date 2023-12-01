@@ -564,12 +564,10 @@ public class FTP extends SocketClient {
 
         String line = _controlInput_.readLine();
 
-        //method created to reduce cognitive complexity
         isLineNull(line);
 
         // In case we run into an anomaly we don't want fatal index exceptions
         // to be thrown.
-        //method created to reduce cognitive complexity
         length = line.length();
 
         isLenghtLesserThanReplyCodeLen(length, line);
@@ -623,28 +621,33 @@ public class FTP extends SocketClient {
         return _replyCode;
     }
 
+    //method created to reduce cognitive complexity
     private void isReplyCodeEqualsServiceNotAvailable() throws FTPConnectionClosedException {
         if (_replyCode == FTPReply.SERVICE_NOT_AVAILABLE) {
             throw new FTPConnectionClosedException("FTP response 421 received.  Server closed connection.");
         }
     }
 
+    //method created to reduce cognitive complexity
     private void isReportReplyThenfireReplyReceived(boolean reportReply) {
         if (reportReply) {
             fireReplyReceived(_replyCode, getReplyString());
         }
     }
 
+    //method created to reduce cognitive complexity
     private boolean isaBoolean(String line, String code) {
         return isStrictMultilineParsing() ? strictCheck(line, code) : lenientCheck(line);
     }
 
+    //method created to reduce cognitive complexity
     private void isLenghtLesserThanReplyCodeLen(int length, String line) throws MalformedServerReplyException {
         if (length < REPLY_CODE_LEN) {
             throw new MalformedServerReplyException("Truncated server reply: " + line);
         }
     }
 
+    //method created to reduce cognitive complexity
     private void isLineNull(String line) throws FTPConnectionClosedException {
         if (line == null) {
             throw new FTPConnectionClosedException("Connection closed without indication.");

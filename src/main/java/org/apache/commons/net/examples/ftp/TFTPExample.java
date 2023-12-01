@@ -85,7 +85,6 @@ public final class TFTPExample {
             }
         }
 
-        //method created to reduce cognitive complexity
         enoughArguments(args, argc);
 
         // Get host and file arguments
@@ -121,12 +120,12 @@ public final class TFTPExample {
 
         System.out.println("Recd: " + tftp.getTotalBytesReceived() + " Sent: " + tftp.getTotalBytesSent());
 
-        //method created to reduce cognitive complexity
         checkClosed(closed);
 
         System.out.println("OK");
     }
 
+    //method created to reduce cognitive complexity
     private static void checkClosed(boolean closed) {
         if (!closed) {
             System.out.println("Failed");
@@ -134,6 +133,7 @@ public final class TFTPExample {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void enoughArguments(String[] args, int argc) {
         // Make sure there are enough arguments
         if (args.length - argc != 3) {

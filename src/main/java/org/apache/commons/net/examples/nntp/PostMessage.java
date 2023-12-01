@@ -107,12 +107,10 @@ public final class PostMessage {
 
             references = stdin.readLine();
 
-            //method created to reduce cognitive complexity
             if (isOrganizationEmptyNull(organization)) {
                 header.addHeaderField("Organization", organization);
             }
 
-            //method created to reduce cognitive complexity
             if (isReferencesEmptyNull(references)) {
                 header.addHeaderField("References", references);
             }
@@ -164,10 +162,12 @@ public final class PostMessage {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isReferencesEmptyNull(String references) {
         return references != null && !references.isEmpty();
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isOrganizationEmptyNull(String organization) {
         return organization != null && !organization.isEmpty();
     }

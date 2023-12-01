@@ -58,7 +58,6 @@ public final class POP3ExportMbox {
 
         final int argCount = args.length - argIdx;
 
-        //method created to reduce cognitive complexity
         checkArgLesserThanThree(argCount);
 
         final String[] arg0 = args[argIdx++].split(":");
@@ -73,13 +72,10 @@ public final class POP3ExportMbox {
             return;
         }
 
-        //method created to reduce cognitive complexity
         final String proto = getProtoString(argCount,args,argIdx);
 
-        //method created to reduce cognitive complexity
         final boolean implicit = getImplicitBool(argCount,args,argIdx);
 
-        //method created to reduce cognitive complexity
         final POP3Client pop3 = getPop3ClientbyProto(proto,implicit);
 
         final int port;
@@ -122,10 +118,8 @@ public final class POP3ExportMbox {
                 System.out.println("Getting messages: " + count);
                 final File mbox = new File(file);
                 if (mbox.isDirectory()) {
-                    //method created to reduce cognitive complexity
                     writingDir(mbox, pop3, count);
                 } else {
-                    //method created to reduce cognitive complexity
                     writingFile(mbox, pop3, count);
                 }
             }
@@ -136,6 +130,7 @@ public final class POP3ExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void writingFile(File mbox, POP3Client pop3, int count) throws IOException {
         System.out.println("Writing file: " + mbox);
         // Currently POP3Client uses iso-8859-1
@@ -146,6 +141,7 @@ public final class POP3ExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void writingDir(File mbox, POP3Client pop3, int count) throws IOException {
         System.out.println("Writing dir: " + mbox);
         // Currently POP3Client uses iso-8859-1
@@ -157,6 +153,7 @@ public final class POP3ExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static POP3Client getPop3ClientbyProto(String proto, boolean implicit) {
         if (proto != null) {
             System.out.println("Using secure protocol: " + proto);
@@ -166,14 +163,17 @@ public final class POP3ExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean getImplicitBool(int argCount, String[] args, int argIdx) {
         return argCount > 4 && Boolean.parseBoolean(args[argIdx++]);
     }
 
+    //method created to reduce cognitive complexity
     private static String getProtoString(int argCount, String[] args, int argIdx) {
         return argCount > 3 ? args[argIdx++] : null;
     }
 
+    //method created to reduce cognitive complexity
     private static void checkArgLesserThanThree(int argCount) {
         if (argCount < 3) {
             System.err.println("Usage: POP3Mail [-F file/directory] <server[:port]> <user> <password|-|*|VARNAME> [TLS [true=implicit]]");

@@ -288,19 +288,16 @@ public final class IMAPExportMbox {
 
         final int argCount = args.length - argIdx;
 
-        //method created to reduce cognitive complexity
         isArgumentCountLesserThanTwo(argCount);
 
         final String uriString = args[argIdx++];
 
-        //method created to reduce cognitive complexity
         URI uri = createURI(uriString);
 
         final String file = args[argIdx++];
         String sequenceSet = argCount > 2 ? args[argIdx++] : "1:*";
         final String itemNames;
 
-        //method created to reduce cognitive complexity
         itemNames = buildItemNameString(argCount, args, argIdx);
 
         final boolean checkSequence = sequenceSet.matches("\\d+:(\\d+|\\*)"); // are we expecting a sequence?
@@ -345,7 +342,6 @@ public final class IMAPExportMbox {
 
         final String path = uri.getPath();
 
-        //method created to reduce cognitive complexity
         isPathNull(path);
 
         final String folder = path.substring(1); // skip the leading /
@@ -369,16 +365,12 @@ public final class IMAPExportMbox {
 
             imap.setSoTimeout(read_timeout * 1000);
 
-            //method created to reduce cognitive complexity
             selectableFolder(imap, folder);
 
-            //method created to reduce cognitive complexity
             matchImapReplyStrings(imap, maxIndexInFolder);
 
-            //method created to reduce cognitive complexity
             setChunkListenerifmboxListenerisNull(imap, mboxListener);
 
-            //method created to reduce cognitive complexity
             fetchLoop(imap, retryWaitSecs, mboxListener, checkSequence, sequenceSet, itemNames);
 
         } catch (final IOException ioe) {
@@ -391,13 +383,12 @@ public final class IMAPExportMbox {
             imap.disconnect();
         }
 
-        //method created to reduce cognitive complexity
         printProcessedMessages(mboxListener);
 
-        //method created to reduce cognitive complexity
         printFolderContainedMessages(mboxListener, maxIndexInFolder);
     }
 
+    //method created to reduce cognitive complexity
     private static URI createURI(String uriString) throws URISyntaxException {
         try {
             return URI.create(uriString);
@@ -406,6 +397,7 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void fetchLoop(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence,
                                   String sequenceSet, String itemNames) throws IOException {
         while (true) {
@@ -415,6 +407,7 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void finallyFetch(boolean printHash, MboxListener mboxListener,
                                      IMAPClient imap) throws IOException {
         if (printHash) {
@@ -438,6 +431,7 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean manageFetch(IMAPClient imap, int retryWaitSecs, MboxListener mboxListener,
                                        boolean checkSequence, String sequenceSet, String itemNames) throws IOException {
         final boolean ok = imap.fetch(sequenceSet, itemNames);
@@ -461,6 +455,7 @@ public final class IMAPExportMbox {
         return true;
     }
 
+    //method created to reduce cognitive complexity
     private static void matchImapReplyStrings(IMAPClient imap, String maxIndexInFolder) {
         for (final String line : imap.getReplyStrings()) {
             maxIndexInFolder = matches(line, PATEXISTS, 1);
@@ -470,18 +465,21 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void setChunkListenerifmboxListenerisNull(IMAPClient imap, MboxListener mboxListener) {
         if (mboxListener != null) {
             imap.setChunkListener(mboxListener);
         } // else the command listener displays the full output without processing
     }
 
+    //method created to reduce cognitive complexity
     private static void selectableFolder(IMAPClient imap, String folder) throws IOException {
         if (!imap.select(folder)) {
             throw new IOException("Could not select folder: " + folder);
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void handleFetchFail(MboxListener mboxListener, String itemNames, String sequenceSet) {
         final String count = mboxListener == null ? "?" : mboxListener.total.toString();
         System.err.println("FETCH " + sequenceSet + " " + itemNames + " failed after processing " + count + " complete messages ");
@@ -490,34 +488,40 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static boolean isaBoolean(boolean ok, int retryWaitSecs, MboxListener mboxListener, boolean checkSequence) {
         return ok || retryWaitSecs <= 0 || mboxListener == null || !checkSequence;
     }
 
+    //method created to reduce cognitive complexity
     private static void printFolderContainedMessages(MboxListener mboxListener, String maxIndexInFolder) {
         if (maxIndexInFolder != null) {
             System.out.println("Folder contained " + maxIndexInFolder + " messages.");
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void printProcessedMessages(MboxListener mboxListener) {
         if (mboxListener != null) {
             System.out.println("Processed " + mboxListener.total + " messages.");
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void isMboxFileExistent(File mboxFile) throws IOException {
         if(mboxFile.exists() && mboxFile.length() > 0){
             throw new IOException("mailbox file: " + mboxFile + " already exists and is non-empty!");
         }
     }
 
+    //method created to reduce cognitive complexity
     private static void isPathNull(String path) {
         if (path == null || path.length() < 1) {
             throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
         }
     }
 
+    //method created to reduce cognitive complexity
     private static String buildItemNameString(int argCount, String[] args, int argIdx) {
         // Handle 0, 1 or multiple item names
         if (argCount > 3) {
@@ -540,6 +544,7 @@ public final class IMAPExportMbox {
         }
     }
 
+    //method created to reduce cognitive complexity
     private static URI parsePath(String uriString) throws URISyntaxException {
         final Matcher m = Pattern.compile("(imaps?://[^/]+)(/.*)").matcher(uriString);
         if (!m.matches()) {
@@ -549,6 +554,7 @@ public final class IMAPExportMbox {
         return new URI(uri.getScheme(), uri.getAuthority(), m.group(2), null, null);
     }
 
+    //method created to reduce cognitive complexity
     private static void isArgumentCountLesserThanTwo(int argCount) {
         if (argCount < 2) {
             System.err.println("Usage: IMAPExportMbox [-LF|-CRLF] [-c n] [-r n] [-R n] [-.] [-X]"
