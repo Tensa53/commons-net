@@ -367,7 +367,7 @@ public final class IMAPExportMbox {
 
             selectableFolder(imap, folder);
 
-            matchImapReplyStrings(imap, maxIndexInFolder);
+            matchImapReplyStrings(imap);
 
             setChunkListenerifmboxListenerisNull(imap, mboxListener);
 
@@ -456,9 +456,9 @@ public final class IMAPExportMbox {
     }
 
     //method created to reduce cognitive complexity
-    private static void matchImapReplyStrings(IMAPClient imap, String maxIndexInFolder) {
+    private static void matchImapReplyStrings(IMAPClient imap) {
         for (final String line : imap.getReplyStrings()) {
-            maxIndexInFolder = matches(line, PATEXISTS, 1);
+            String maxIndexInFolder = matches(line, PATEXISTS, 1);
             if (maxIndexInFolder != null) {
                 break;
             }

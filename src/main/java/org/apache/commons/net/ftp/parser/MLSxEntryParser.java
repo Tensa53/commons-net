@@ -215,6 +215,7 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
             }
             final String valueLowerCase = factvalue.toLowerCase(Locale.ENGLISH);
             if (isFactnameEqualsSizeOrFactnameEqualsSizd(factname)) {
+                assert file != null;
                 file.setSize(Long.parseLong(factvalue));
             } else {
                 file = setuFTPFIle(file, factname, factvalue, valueLowerCase, hasUnixMode);
