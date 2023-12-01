@@ -17,8 +17,9 @@
 
 package org.apache.commons.net.ftp;
 
-import static junit.framework.TestCase.assertFalse;
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.net.SocketException;
@@ -66,14 +67,9 @@ public class FTPSClientTest extends AbstractFtpsTest {
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    public void testHasFeature() throws SocketException{
+    public void testHasFeature() throws SocketException, IOException {
         trace(">>testHasFeature");
-        try {
-            loginClient().disconnect();
-            assertTrue("disconnect succeded", true);
-        } catch (IOException e) {
-            fail("failed to disconnect");
-        }
+        loginClient().disconnect();
         trace("<<testHasFeature");
     }
 
@@ -193,14 +189,9 @@ public class FTPSClientTest extends AbstractFtpsTest {
     }
 
     @Test(timeout = TEST_TIMEOUT)
-    public void testRetrieveFilePathNameRoot() throws SocketException {
+    public void testRetrieveFilePathNameRoot() throws SocketException, IOException {
         trace(">>testRetrieveFilePathNameRoot");
-        try {
-            retrieveFile("/file.txt");
-            assertTrue("RetrieveFilePathNameRoot succeded", true);
-        } catch (IOException e) {
-            assertFalse("Throwing IOException, RetrieveFilePathNameRoot failed", false);
-        }
+        retrieveFile("/file.txt");
         trace("<<testRetrieveFilePathNameRoot");
     }
 
