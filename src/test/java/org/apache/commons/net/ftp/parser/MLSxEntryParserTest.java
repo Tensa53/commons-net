@@ -79,12 +79,10 @@ public class MLSxEntryParserTest extends AbstractFTPParseTest {
 
     @Override
     public void testParseFieldsOnDirectory() throws Exception {
-        assertTrue("Empty Method, skipping this test", true);
     }
 
     @Override
     public void testParseFieldsOnFile() throws Exception {
-        assertTrue("Empty Method, skipping this test", true);
     }
 
     @Override

@@ -128,7 +128,6 @@ public class MVSFTPEntryParserTest extends AbstractFTPParseTest {
     @Override
     public void testDefaultPrecision() {
         // TODO Not sure what dates are parsed
-        assertTrue("Emtpy Method, skipping this test", true);
     }
 
     /*
@@ -242,7 +241,6 @@ public class MVSFTPEntryParserTest extends AbstractFTPParseTest {
     @Override
     public void testRecentPrecision() {
         // TODO Auto-generated method stub
-        assertTrue("Emtpy Method, skipping this test", true);
     }
 
     public void testUnixListings() {
