@@ -429,17 +429,11 @@ public class FTPFile implements Serializable {
             fmt.format(" %8d", Long.valueOf(getSize()));
             Calendar timestamp = getTimestamp();
             if (timestamp != null) {
-                if (timezone != null) {
-                    final TimeZone newZone = TimeZone.getTimeZone(timezone);
-                    if (!newZone.equals(timestamp.getTimeZone())) {
-                        final Date original = timestamp.getTime();
-                        final Calendar newStamp = Calendar.getInstance(newZone);
-                        newStamp.setTime(original);
-                        timestamp = newStamp;
-                    }
-                }
+                timestamp = getTimestampByTimezone(timestamp, timezone);
+
                 fmt.format(" %1$tY-%1$tm-%1$td", timestamp);
                 // Only display time units if they are present
+
                 if (timestamp.isSet(Calendar.HOUR_OF_DAY)) {
                     fmt.format(" %1$tH", timestamp);
                     if (timestamp.isSet(Calendar.MINUTE)) {
@@ -458,6 +452,23 @@ public class FTPFile implements Serializable {
             sb.append(getName());
         }
         return sb.toString();
+    }
+
+    //method created to reduce cognitive complexity
+    private Calendar getTimestampByTimezone(Calendar timestamp, String timezone) {
+        Calendar innerTimestamp = (Calendar) timestamp.clone();
+
+        if (timezone != null) {
+            final TimeZone newZone = TimeZone.getTimeZone(timezone);
+            if (!newZone.equals(timestamp.getTimeZone())) {
+                final Date original = timestamp.getTime();
+                final Calendar newStamp = Calendar.getInstance(newZone);
+                newStamp.setTime(original);
+                innerTimestamp = newStamp;
+            }
+        }
+
+        return innerTimestamp;
     }
 
     /*

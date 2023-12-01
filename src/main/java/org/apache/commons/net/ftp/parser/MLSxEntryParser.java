@@ -185,24 +185,17 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
     @Override
     public FTPFile parseFTPEntry(final String entry) {
         if (entry.startsWith(" ")) {// leading space means no facts are present
-            if (entry.length() > 1) { // is there a path name?
-                final FTPFile file = new FTPFile();
-                file.setRawListing(entry);
-                file.setName(entry.substring(1));
-                return file;
-            }
-            return null; // Invalid - no pathname
-
+            return checkEntryLenght(entry);
         }
         final String[] parts = entry.split(" ", 2); // Path may contain space
-        if (parts.length != 2 || parts[1].isEmpty()) {
+        if (isPartsLengthNotTwoAndPartsOneEmpty(parts)) {
             return null; // no space found or no file name
         }
         final String factList = parts[0];
         if (!factList.endsWith(";")) {
             return null;
         }
-        final FTPFile file = new FTPFile();
+        FTPFile file = new FTPFile();
         file.setRawListing(entry);
         file.setName(parts[1]);
         final String[] facts = factList.split(";");
@@ -221,45 +214,98 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
                 continue; // nothing to see here
             }
             final String valueLowerCase = factvalue.toLowerCase(Locale.ENGLISH);
-            if ("size".equals(factname) || "sizd".equals(factname)) {
+            if (isFactnameEqualsSizeOrFactnameEqualsSizd(factname)) {
+                assert file != null;
                 file.setSize(Long.parseLong(factvalue));
-            } else if ("modify".equals(factname)) {
+            } else {
+                file = setuFTPFIle(file, factname, factvalue, valueLowerCase, hasUnixMode);
+            }
+        } // each fact
+        return file;
+    }
+
+    private FTPFile setuFTPFIle(FTPFile file, String factname, String factvalue, String valueLowerCase, boolean hasUnixMode) {
+        switch (factname) {
+            case "modify":
                 final Calendar parsed = parseGMTdateTime(factvalue);
                 if (parsed == null) {
                     return null;
                 }
                 file.setTimestamp(parsed);
-            } else if ("type".equals(factname)) {
+            break;
+
+            case "type":
                 final Integer intType = TYPE_TO_INT.get(valueLowerCase);
                 if (intType == null) {
                     file.setType(FTPFile.UNKNOWN_TYPE);
                 } else {
                     file.setType(intType.intValue());
                 }
-            } else if (factname.startsWith("unix.")) {
-                final String unixfact = factname.substring("unix.".length()).toLowerCase(Locale.ENGLISH);
-                if ("group".equals(unixfact)) {
-                    file.setGroup(factvalue);
-                } else if ("owner".equals(unixfact)) {
-                    file.setUser(factvalue);
-                } else if ("mode".equals(unixfact)) { // e.g. 0[1]755
-                    final int off = factvalue.length() - 3; // only parse last 3 digits
-                    for (int i = 0; i < 3; i++) {
-                        final int ch = factvalue.charAt(off + i) - '0';
-                        if (ch >= 0 && ch <= 7) { // Check it's valid octal
-                            for (final int p : UNIX_PERMS[ch]) {
-                                file.setPermission(UNIX_GROUPS[i], p, true);
-                            }
-                        } else {
-                            // TODO should this cause failure, or can it be reported somehow?
-                        }
-                    } // digits
-                } // mode
-            } // unix.
-            else if (!hasUnixMode && "perm".equals(factname)) { // skip if we have the UNIX.mode
-                doUnixPerms(file, valueLowerCase);
-            } // process "perm"
-        } // each fact
+            break;
+
+            default:
+            break;
+        }
+
+        if (factname.startsWith("unix.")) {
+            if (file == null){
+                return null;
+            } else {
+                setFTPFileUserGroupPermission(file, factname, factvalue);
+            }
+        } // unix.
+        else if (isNotUnixModeAndPermEqualsFactname(hasUnixMode, factname)) { // skip if we have the UNIX.mode
+            doUnixPerms(file, valueLowerCase);
+        }
+
         return file;
+    }
+
+    private static FTPFile setFTPFileUserGroupPermission(FTPFile file, String factname, String factvalue) {
+        final String unixfact = factname.substring("unix.".length()).toLowerCase(Locale.ENGLISH);
+        if ("group".equals(unixfact)) {
+            file.setGroup(factvalue);
+        } else if ("owner".equals(unixfact)) {
+            file.setUser(factvalue);
+        } else if ("mode".equals(unixfact)) { // e.g. 0[1]755
+            final int off = factvalue.length() - 3; // only parse last 3 digits
+            for (int i = 0; i < 3; i++) {
+                final int ch = factvalue.charAt(off + i) - '0';
+                if (ch >= 0 && ch <= 7) { // Check it's valid octal
+                    for (final int p : UNIX_PERMS[ch]) {
+                        file.setPermission(UNIX_GROUPS[i], p, true);
+                    }
+                } else {
+                    // TODO should this cause failure, or can it be reported somehow?
+                }
+            } // digits
+        } // mode
+        return file;
+    }
+
+    //method created to reduce cognitive complexity
+    private FTPFile checkEntryLenght(String entry) {
+        if (entry.length() > 1) { // is there a path name?
+            final FTPFile file = new FTPFile();
+            file.setRawListing(entry);
+            file.setName(entry.substring(1));
+            return file;
+        }
+        return null; // Invalid - no pathname
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isFactnameEqualsSizeOrFactnameEqualsSizd(String factname) {
+        return "size".equals(factname) || "sizd".equals(factname);
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isPartsLengthNotTwoAndPartsOneEmpty(String[] parts) {
+        return parts.length != 2 || parts[1].isEmpty();
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isNotUnixModeAndPermEqualsFactname(boolean hasUnixMode, String factname) {
+        return !hasUnixMode && "perm".equals(factname);
     }
 }

@@ -100,9 +100,10 @@ public class UtilTest {
     private final OutputStream dst = new ByteArrayOutputStream();
 
     @Test
-    public void testcloseQuietly() {
+    public void testcloseQuietly(){
         Util.closeQuietly((Closeable) null);
         Util.closeQuietly((Socket) null);
+        //If exception is launched, this test will fail. Otherwise, exception suppressed, therefore success.
     }
 
     @Test
@@ -182,6 +183,7 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = -1;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 
     @Test
@@ -189,6 +191,7 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = 0;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 
     @Test
@@ -196,6 +199,7 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = 1;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 
     @Test
@@ -203,6 +207,7 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = -1;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 
     @Test
@@ -210,6 +215,7 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = 0;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 
     @Test
@@ -217,5 +223,6 @@ public class UtilTest {
         final long streamSize = 0;
         final int bufferSize = 1;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
+        //No exception launched, test is correct
     }
 }

@@ -45,6 +45,17 @@ public final class NewGroupsOrNewsQuery {
     private StringBuffer newsgroups;
     private final boolean isGMT;
 
+    //Handles short form format for years as well as normal format.
+    private void addYearToBuffer(String str, StringBuilder buffer)
+    {
+        int num = str.length();
+        if (num >= 2) {
+            buffer.append(str.substring(num - 2));
+        } else {
+            buffer.append("00");
+        }
+    }
+
     /**
      * Creates a new query using the given time as a reference point.
      *
@@ -65,13 +76,8 @@ public final class NewGroupsOrNewsQuery {
         // Get year
         num = date.get(Calendar.YEAR);
         str = Integer.toString(num);
-        num = str.length();
 
-        if (num >= 2) {
-            buffer.append(str.substring(num - 2));
-        } else {
-            buffer.append("00");
-        }
+        addYearToBuffer(str, buffer);
 
         // Get month
         num = date.get(Calendar.MONTH) + 1;

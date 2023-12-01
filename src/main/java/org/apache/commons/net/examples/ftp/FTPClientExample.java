@@ -27,6 +27,8 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.Duration;
 import java.util.Arrays;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.apache.commons.net.PrintCommandListener;
 import org.apache.commons.net.ftp.FTP;
@@ -92,6 +94,8 @@ public final class FTPClientExample {
         };
     }
 
+    static Logger logger = Logger.getLogger(FTPClientExample.class.getName());
+
     public static void main(final String[] args) throws UnknownHostException {
         boolean storeFile = false, binaryTransfer = false, error = false, listFiles = false, listNames = false, hidden = false;
         boolean localActive = false, useEpsvWithIPv4 = false, feat = false, printHash = false;
@@ -116,6 +120,7 @@ public final class FTPClientExample {
         String serverType = null;
         String defaultDateFormat = null;
         String recentDateFormat = null;
+        final String FEAT = "FEAT";
 
         int base = 0;
         for (base = 0; base < args.length; base++) {
@@ -355,6 +360,8 @@ public final class FTPClientExample {
 
             ftp.setUseEPSVwithIPv4(useEpsvWithIPv4);
 
+            String toDebug;
+
             if (storeFile) {
                 try (final InputStream input = new FileInputStream(local)) {
                     ftp.storeFile(remote, input);
@@ -414,28 +421,34 @@ public final class FTPClientExample {
                 // boolean feature check
                 if (remote != null) { // See if the command is present
                     if (ftp.hasFeature(remote)) {
-                        System.out.println("Has feature: " + remote);
+                        toDebug = "Has feature: " + remote;
                     } else if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-                        System.out.println("FEAT " + remote + " was not detected");
+                        toDebug = String.format("%s %s was not detected", FEAT, remote);
                     } else {
-                        System.out.println("Command failed: " + ftp.getReplyString());
+                        toDebug = "Command failed: " + ftp.getReplyString();
                     }
 
-                    // Strings feature check
+                    logger.log(Level.INFO, toDebug);
+
+                            // Strings feature check
                     final String[] features = ftp.featureValues(remote);
                     if (features != null) {
                         for (final String f : features) {
-                            System.out.println("FEAT " + remote + "=" + f + ".");
+                            toDebug = FEAT + " " + remote + "=" + f + ".";
+                            logger.log(Level.INFO, toDebug);
                         }
                     } else if (FTPReply.isPositiveCompletion(ftp.getReplyCode())) {
-                        System.out.println("FEAT " + remote + " is not present");
+                        toDebug = FEAT + " " + remote + " is not present";
+                        logger.log(Level.INFO, toDebug);
                     } else {
-                        System.out.println("Command failed: " + ftp.getReplyString());
+                        toDebug = "Command failed: " + ftp.getReplyString();
+                        logger.log(Level.INFO, toDebug);
                     }
                 } else if (ftp.features()) {
 //                        Command listener has already printed the output
                 } else {
-                    System.out.println("Failed: " + ftp.getReplyString());
+                    toDebug = "Failed: " + ftp.getReplyString();
+                    logger.log(Level.INFO, toDebug);
                 }
             } else if (doCommand != null) {
                 if (ftp.doCommand(doCommand, remote)) {
@@ -444,7 +457,8 @@ public final class FTPClientExample {
 //                        System.out.println(s);
 //                    }
                 } else {
-                    System.out.println("Failed: " + ftp.getReplyString());
+                    toDebug = "Failed: " + ftp.getReplyString();
+                    logger.log(Level.INFO, toDebug);
                 }
             } else {
                 try (final OutputStream output = new FileOutputStream(local)) {

@@ -50,10 +50,7 @@ public final class ServerToServerFTP {
         final FTPClient ftp2;
         final ProtocolCommandListener listener;
 
-        if (args.length < 8) {
-            System.err.println("Usage: ftp <host1> <user1> <pass1> <file1> <host2> <user2> <pass2> <file2>");
-            System.exit(1);
-        }
+        checkArgs(args);
 
         server1 = args[0];
         parts = server1.split(":");
@@ -82,11 +79,9 @@ public final class ServerToServerFTP {
 
         try {
             final int reply;
-            if (port1 > 0) {
-                ftp1.connect(server1, port1);
-            } else {
-                ftp1.connect(server1);
-            }
+
+            ftp1Connect(ftp1, port1, server1);
+
             System.out.println("Connected to " + server1 + ".");
 
             reply = ftp1.getReplyCode();
@@ -97,13 +92,7 @@ public final class ServerToServerFTP {
                 System.exit(1);
             }
         } catch (final IOException e) {
-            if (ftp1.isConnected()) {
-                try {
-                    ftp1.disconnect();
-                } catch (final IOException f) {
-                    // do nothing
-                }
-            }
+            checkFtp1Connection(ftp1);
             System.err.println("Could not connect to server1.");
             e.printStackTrace();
             System.exit(1);
@@ -111,11 +100,9 @@ public final class ServerToServerFTP {
 
         try {
             final int reply;
-            if (port2 > 0) {
-                ftp2.connect(server2, port2);
-            } else {
-                ftp2.connect(server2);
-            }
+
+            ftp2Connect(ftp2, server2, port2);
+
             System.out.println("Connected to " + server2 + ".");
 
             reply = ftp2.getReplyCode();
@@ -126,13 +113,7 @@ public final class ServerToServerFTP {
                 System.exit(1);
             }
         } catch (final IOException e) {
-            if (ftp2.isConnected()) {
-                try {
-                    ftp2.disconnect();
-                } catch (final IOException f) {
-                    // do nothing
-                }
-            }
+            checkFtp2Connection(ftp2);
             System.err.println("Could not connect to server2.");
             e.printStackTrace();
             System.exit(1);
@@ -161,7 +142,10 @@ public final class ServerToServerFTP {
             // transfer is completed (in the case of passive mode transfers).
             // Therefore, calling store first would hang waiting for a preliminary
             // reply.
-            if (!ftp1.remoteRetrieve(file1) || !ftp2.remoteStoreUnique(file2)) {
+
+            //!ftp1.remoteRetrieve(file1) || !ftp2.remoteStoreUnique(file2)
+
+            if (isTransferInitiable(ftp1, ftp2, file1, file2)) {
                 System.err.println("Couldn't initiate transfer. Check that file names are valid.");
                 break __main;
             }
@@ -174,23 +158,86 @@ public final class ServerToServerFTP {
             e.printStackTrace();
             System.exit(1);
         } finally {
-            try {
-                if (ftp1.isConnected()) {
-                    ftp1.logout();
-                    ftp1.disconnect();
-                }
-            } catch (final IOException e) {
-                // do nothing
-            }
+            checkFtp1ConnectionLogin(ftp1);
 
+            checkFtp2ConnectionLogin(ftp2);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void ftp2Connect(FTPClient ftp2, String server2, int port2) throws IOException {
+        if (port2 > 0) {
+            ftp2.connect(server2, port2);
+        } else {
+            ftp2.connect(server2);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void ftp1Connect(FTPClient ftp1, int port1, String server1) throws IOException {
+        if (port1 > 0) {
+            ftp1.connect(server1, port1);
+        } else {
+            ftp1.connect(server1);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkFtp2ConnectionLogin(FTPClient ftp2) {
+        try {
+            if (ftp2.isConnected()) {
+                ftp2.logout();
+                ftp2.disconnect();
+            }
+        } catch (final IOException e) {
+            // do nothing
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkFtp1ConnectionLogin(FTPClient ftp1) {
+        try {
+            if (ftp1.isConnected()) {
+                ftp1.logout();
+                ftp1.disconnect();
+            }
+        } catch (final IOException e) {
+            // do nothing
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkFtp2Connection(FTPClient ftp2) {
+        if (ftp2.isConnected()) {
             try {
-                if (ftp2.isConnected()) {
-                    ftp2.logout();
-                    ftp2.disconnect();
-                }
-            } catch (final IOException e) {
+                ftp2.disconnect();
+            } catch (final IOException f) {
                 // do nothing
             }
         }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkFtp1Connection(FTPClient ftp1) {
+        if (ftp1.isConnected()) {
+            try {
+                ftp1.disconnect();
+            } catch (final IOException f) {
+                // do nothing
+            }
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkArgs(String[] args) {
+        if (args.length < 8) {
+            System.err.println("Usage: ftp <host1> <user1> <pass1> <file1> <host2> <user2> <pass2> <file2>");
+            System.exit(1);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isTransferInitiable(FTPClient ftp1, FTPClient ftp2, String file1, String file2) throws IOException {
+        return !ftp1.remoteRetrieve(file1) || !ftp2.remoteStoreUnique(file2);
     }
 }

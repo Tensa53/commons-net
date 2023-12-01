@@ -238,6 +238,44 @@ public class IMAP extends SocketClient {
         getReply(true); // tagged response
     }
 
+    //Throws EOFException if reply is null
+    private void checkNullReply(String line) throws EOFException {
+        String unexpectedCloseString = "Connection closed without indication.";
+        if (line == null) {
+            throw new EOFException(unexpectedCloseString);
+        }
+    }
+
+    //Returns the response code on the last line of the reply
+    private int tagReply(String line) throws IOException {
+        while (IMAPReply.isUntagged(line)) {
+            int literalCount = IMAPReply.literalCount(line);
+            final boolean isMultiLine = literalCount >= 0;
+            while (literalCount >= 0) {
+                line = _reader.readLine();
+                checkNullReply(line);
+                replyLines.add(line);
+                literalCount -= line.length() + 2; // Allow for CRLF
+            }
+            if (isMultiLine) {
+                final IMAPChunkListener il = chunkListener;
+                if (il != null) {
+                    final boolean clear = il.chunkReceived(this);
+                    if (clear) {
+                        fireReplyReceived(IMAPReply.PARTIAL, getReplyString());
+                        replyLines.clear();
+                    }
+                }
+            }
+            line = _reader.readLine(); // get next chunk or final tag
+            checkNullReply(line);
+            replyLines.add(line);
+        }
+        // check the response code on the last line
+        replyCode = IMAPReply.getReplyCode(line);
+        return replyCode;
+    }
+
     /**
      * Get the reply for a command, reading the response until the reply is found.
      *
@@ -245,45 +283,16 @@ public class IMAP extends SocketClient {
      * @throws IOException
      */
     private void getReply(final boolean wantTag) throws IOException {
+
         replyLines.clear();
         String line = _reader.readLine();
 
-        if (line == null) {
-            throw new EOFException("Connection closed without indication.");
-        }
+        checkNullReply(line);
 
         replyLines.add(line);
 
         if (wantTag) {
-            while (IMAPReply.isUntagged(line)) {
-                int literalCount = IMAPReply.literalCount(line);
-                final boolean isMultiLine = literalCount >= 0;
-                while (literalCount >= 0) {
-                    line = _reader.readLine();
-                    if (line == null) {
-                        throw new EOFException("Connection closed without indication.");
-                    }
-                    replyLines.add(line);
-                    literalCount -= line.length() + 2; // Allow for CRLF
-                }
-                if (isMultiLine) {
-                    final IMAPChunkListener il = chunkListener;
-                    if (il != null) {
-                        final boolean clear = il.chunkReceived(this);
-                        if (clear) {
-                            fireReplyReceived(IMAPReply.PARTIAL, getReplyString());
-                            replyLines.clear();
-                        }
-                    }
-                }
-                line = _reader.readLine(); // get next chunk or final tag
-                if (line == null) {
-                    throw new EOFException("Connection closed without indication.");
-                }
-                replyLines.add(line);
-            }
-            // check the response code on the last line
-            replyCode = IMAPReply.getReplyCode(line);
+            replyCode = tagReply(line);
         } else {
             replyCode = IMAPReply.getUntaggedReplyCode(line);
         }

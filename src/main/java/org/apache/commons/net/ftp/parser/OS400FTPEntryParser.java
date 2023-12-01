@@ -282,76 +282,131 @@ public class OS400FTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
         return string == null || string.isEmpty();
     }
 
+    //Called inside parseFTPEntry, requires previous regex match
+    private String parseDateSTR()
+    {
+        if (!isNullOrEmpty(group(3)) || !isNullOrEmpty(group(4))) {
+           return group(3) + " " + group(4);
+        }
+        else {
+            return "";
+        }
+    }
+
+    //Called inside parseFTPEntry, sets a file's timestamp using the String containing its date
+    private void setFileTimestamp(FTPFile file, String datestr)
+    {
+        try {
+            file.setTimestamp(super.parseTimestamp(datestr));
+        } catch (final ParseException e) {
+            // intentionally do nothing
+        }
+    }
+
+    //Common check inside parseFileType for missing name or filesize
+    private boolean missingFileStandard(String filesize, String name)
+    {
+        return isNullOrEmpty(filesize) || isNullOrEmpty(name);
+    }
+
+    //Groups filetype assignment. -2 indicates that caller must return null due to error.
+    private int parseFileType(String typeStr, String filesize, String name, String datestr)
+    {
+        final int type;
+        if (typeStr.equalsIgnoreCase("*STMF")) {
+            type = FTPFile.FILE_TYPE;
+        } else if (typeStr.equalsIgnoreCase("*DIR")) {
+            type = FTPFile.DIRECTORY_TYPE;
+            if (missingFileStandard(filesize, name)){
+                return -2;
+            }
+        } else if (typeStr.equalsIgnoreCase("*FILE")) {
+            // File, defines the structure of the data (columns of a row)
+            // but the data is stored in one or more members. Typically, a
+            // source file contains multiple members whereas it is
+            // recommended (but not enforced) to use one member per data
+            // file.
+            // Save files are a special type of files which are used
+            // to save objects, e.g. for backups.
+            if (name == null || !name.toUpperCase(Locale.ROOT).endsWith(".SAVF")) {
+                return -2;
+            }
+            type = FTPFile.FILE_TYPE;
+        } else if (typeStr.equalsIgnoreCase("*MEM")) {
+            type = FTPFile.FILE_TYPE;
+
+            if (isNullOrEmpty(name)) {
+                return -2;
+            }
+            if (!(isNullOrEmpty(filesize) && isNullOrEmpty(datestr))) {
+                return -2;
+            }
+        } else {
+            type = FTPFile.UNKNOWN_TYPE;
+        }
+        return type;
+    }
+
+    //Checks if path should include a separator or not
+    private boolean setPathSeparator(String typeStr)
+    {
+        if (typeStr.equalsIgnoreCase("*FILE"))
+        {
+            return false;
+        }
+        else
+        {
+            return !typeStr.equalsIgnoreCase("*MEM");
+        }
+    }
+
+    //Returns new appropriate filename based on filetype
+    private String checkName(String typeStr, String name)
+    {
+        if(typeStr.equalsIgnoreCase("*MEM"))
+        {
+            // Quick and dirty bug fix to make SelectorUtils work.
+            // Class SelectorUtils uses 'File.separator' to splitt
+            // a given path into pieces. But actually it had to
+            // use the separator of the FTP server, which is a forward
+            // slash in case of an AS/400.
+            name = name.replace('/', File.separatorChar);
+        }
+        if (name.endsWith("/")) {
+            name = name.substring(0, name.length() - 1);
+        }
+        return name;
+    }
+
     @Override
     public FTPFile parseFTPEntry(final String entry) {
 
         final FTPFile file = new FTPFile();
         file.setRawListing(entry);
-        final int type;
 
         if (matches(entry)) {
             final String usr = group(1);
             final String filesize = group(2);
-            String datestr = "";
-            if (!isNullOrEmpty(group(3)) || !isNullOrEmpty(group(4))) {
-                datestr = group(3) + " " + group(4);
-            }
+            String datestr = parseDateSTR();
             final String typeStr = group(5);
             String name = group(6);
 
-            boolean mustScanForPathSeparator = true;
+            boolean mustScanForPathSeparator;
 
-            try {
-                file.setTimestamp(super.parseTimestamp(datestr));
-            } catch (final ParseException e) {
-                // intentionally do nothing
-            }
+            setFileTimestamp(file, datestr);
 
-            if (typeStr.equalsIgnoreCase("*STMF")) {
-                type = FTPFile.FILE_TYPE;
-                if (isNullOrEmpty(filesize) || isNullOrEmpty(name)) {
-                    return null;
-                }
-            } else if (typeStr.equalsIgnoreCase("*DIR")) {
-                type = FTPFile.DIRECTORY_TYPE;
-                if (isNullOrEmpty(filesize) || isNullOrEmpty(name)) {
-                    return null;
-                }
-            } else if (typeStr.equalsIgnoreCase("*FILE")) {
-                // File, defines the structure of the data (columns of a row)
-                // but the data is stored in one or more members. Typically, a
-                // source file contains multiple members whereas it is
-                // recommended (but not enforced) to use one member per data
-                // file.
-                // Save files are a special type of files which are used
-                // to save objects, e.g. for backups.
-                if (name == null || !name.toUpperCase(Locale.ROOT).endsWith(".SAVF")) {
-                    return null;
-                }
-                mustScanForPathSeparator = false;
-                type = FTPFile.FILE_TYPE;
-            } else if (typeStr.equalsIgnoreCase("*MEM")) {
-                mustScanForPathSeparator = false;
-                type = FTPFile.FILE_TYPE;
+            int type = parseFileType(typeStr, filesize, name, datestr);
 
-                if (isNullOrEmpty(name)) {
-                    return null;
-                }
-                if (!(isNullOrEmpty(filesize) && isNullOrEmpty(datestr))) {
-                    return null;
-                }
-
-                // Quick and dirty bug fix to make SelectorUtils work.
-                // Class SelectorUtils uses 'File.separator' to splitt
-                // a given path into pieces. But actually it had to
-                // use the separator of the FTP server, which is a forward
-                // slash in case of an AS/400.
-                name = name.replace('/', File.separatorChar);
-            } else {
-                type = FTPFile.UNKNOWN_TYPE;
+            if(type == -2)
+            {
+                return null;
             }
 
             file.setType(type);
+
+            mustScanForPathSeparator = setPathSeparator(typeStr);
+
+            name = checkName(typeStr, name);
 
             file.setUser(usr);
 
@@ -361,9 +416,6 @@ public class OS400FTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
                 // intentionally do nothing
             }
 
-            if (name.endsWith("/")) {
-                name = name.substring(0, name.length() - 1);
-            }
             if (mustScanForPathSeparator) {
                 final int pos = name.lastIndexOf('/');
                 if (pos > -1) {

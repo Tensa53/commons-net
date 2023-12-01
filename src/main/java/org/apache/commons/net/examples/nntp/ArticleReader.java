@@ -33,7 +33,7 @@ public class ArticleReader {
 
     public static void main(final String[] args) throws SocketException, IOException {
 
-        if (args.length != 2 && args.length != 3 && args.length != 5) {
+        if (isArgsLenghtDifferentFromTwoThreeFive(args)) {
             System.out.println("Usage: MessageThreading <hostname> <groupname> [<article specifier> [<user> <password>]]");
             return;
         }
@@ -86,6 +86,11 @@ public class ArticleReader {
             }
             brBody.close();
         }
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isArgsLenghtDifferentFromTwoThreeFive(String[] args) {
+        return args.length != 2 && args.length != 3 && args.length != 5;
     }
 
 }

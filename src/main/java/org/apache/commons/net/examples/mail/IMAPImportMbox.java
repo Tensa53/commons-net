@@ -80,49 +80,39 @@ public final class IMAPImportMbox {
     }
 
     public static void main(final String[] args) throws IOException {
-        if (args.length < 2) {
-            System.err.println("Usage: IMAPImportMbox imap[s]://user:password@host[:port]/folder/path <mboxfile> [selectors]");
-            System.err
-                    .println("\tWhere: a selector is a list of numbers/number ranges - 1,2,3-10" + " - or a list of strings to match in the initial From line");
-            System.exit(1);
-        }
+
+        checkArgsLesserThanTwo(args);
 
         final URI uri = URI.create(args[0]);
         final String file = args[1];
 
         final File mbox = new File(file);
-        if (!mbox.isFile() || !mbox.canRead()) {
-            throw new IOException("Cannot read mailbox file: " + mbox);
-        }
+
+        isMboxAFileOrIsReadable(mbox);
 
         final String path = uri.getPath();
-        if (path == null || path.length() < 1) {
-            throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
-        }
+
+        isPathNull(path);
+
         final String folder = path.substring(1); // skip the leading /
 
         final List<String> contains = new ArrayList<>(); // list of strings to find
-        final BitSet msgNums = new BitSet(); // list of message numbers
+        BitSet msgNumsB = new BitSet();
 
         for (int i = 2; i < args.length; i++) {
             final String arg = args[i];
-            if (arg.matches("\\d+(-\\d+)?(,\\d+(-\\d+)?)*")) { // number,m-n
+            if (arg.matches("\\d+(-\\d+)?(,\\d+(-\\d+)?)*")) {// number,m-n
+
                 for (final String entry : arg.split(",")) {
-                    final String[] parts = entry.split("-");
-                    if (parts.length == 2) { // m-n
-                        final int low = Integer.parseInt(parts[0]);
-                        final int high = Integer.parseInt(parts[1]);
-                        for (int j = low; j <= high; j++) {
-                            msgNums.set(j);
-                        }
-                    } else {
-                        msgNums.set(Integer.parseInt(entry));
-                    }
+                    msgNumsB = messageNumbersSetBitIndex(entry);
                 }
             } else {
                 contains.add(arg); // not a number/number range
             }
         }
+
+        final BitSet msgNums = msgNumsB; // list of message numbers
+
 //        System.out.println(msgNums.toString());
 //        System.out.println(java.util.Arrays.toString(contains.toArray()));
 
@@ -141,9 +131,7 @@ public final class IMAPImportMbox {
                 boolean wanted = false; // Skip any leading rubbish
                 while ((line = br.readLine()) != null) {
                     if (line.startsWith("From ")) { // start of message; i.e. end of previous (if any)
-                        if (process(sb, imap, folder, total)) { // process previous message (if any)
-                            loaded++;
-                        }
+                        loaded+= processableMessageCounterUp(sb, imap, folder, total);
                         sb.setLength(0);
                         total++;
                         wanted = wanted(total, line, msgNums, contains);
@@ -156,7 +144,8 @@ public final class IMAPImportMbox {
                         sb.append(CRLF);
                     }
                 }
-                if (wanted && process(sb, imap, folder, total)) { // last message (if any)
+
+                if (isWantedAndProcessable(wanted, sb, imap, folder, total)) { // last message (if any)
                     loaded++;
                 }
             } catch (final IOException e) {
@@ -170,6 +159,62 @@ public final class IMAPImportMbox {
             }
             System.out.println("Processed " + total + " messages, loaded " + loaded);
         }
+
+    //method created to reduce cognitive complexity
+    private static int processableMessageCounterUp(StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
+        if (process(sb, imap, folder, total)) { // process previous message (if any)
+            return 1;
+        }
+
+        return 0;
+    }
+
+    //method created to reduce cognitive complexity
+    private static BitSet messageNumbersSetBitIndex(String entry) {
+        BitSet msgNums = new BitSet();
+
+        final String[] parts = entry.split("-");
+        if (parts.length == 2) { // m-n
+            final int low = Integer.parseInt(parts[0]);
+            final int high = Integer.parseInt(parts[1]);
+            for (int j = low; j <= high; j++) {
+                msgNums.set(j);
+            }
+        } else {
+            msgNums.set(Integer.parseInt(entry));
+        }
+
+        return msgNums;
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isWantedAndProcessable(boolean wanted, StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
+        return wanted && process(sb, imap, folder, total);
+    }
+
+    //method created to reduce cognitive complexity
+    private static void isPathNull(String path) {
+        if (path == null || path.length() < 1) {
+            throw new IllegalArgumentException("Invalid folderPath: '" + path + "'");
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void isMboxAFileOrIsReadable(File mbox) throws IOException {
+        if (!mbox.isFile() || !mbox.canRead()) {
+            throw new IOException("Cannot read mailbox file: " + mbox);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkArgsLesserThanTwo(String[] args) {
+        if (args.length < 2) {
+            System.err.println("Usage: IMAPImportMbox imap[s]://user:password@host[:port]/folder/path <mboxfile> [selectors]");
+            System.err
+                    .println("\tWhere: a selector is a list of numbers/number ranges - 1,2,3-10" + " - or a list of strings to match in the initial From line");
+            System.exit(1);
+        }
+    }
 
     private static boolean process(final StringBuilder sb, final IMAPClient imap, final String folder, final int msgNum) throws IOException {
         final int length = sb.length();

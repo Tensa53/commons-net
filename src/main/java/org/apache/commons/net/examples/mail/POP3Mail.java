@@ -36,10 +36,8 @@ import org.apache.commons.net.pop3.POP3SClient;
 public final class POP3Mail {
 
     public static void main(final String[] args) {
-        if (args.length < 3) {
-            System.err.println("Usage: POP3Mail <server[:port]> <username> <password|-|*|VARNAME> [TLS [true=implicit]]");
-            System.exit(1);
-        }
+
+        checkArgs(args);
 
         final String[] arg0 = args[0].split(":");
         final String server = arg0[0];
@@ -54,7 +52,8 @@ public final class POP3Mail {
         }
 
         final String proto = args.length > 3 ? args[3] : null;
-        final boolean implicit = args.length > 4 && Boolean.parseBoolean(args[4]);
+
+        final boolean implicit = isImplicit(args);
 
         final POP3Client pop3;
 
@@ -137,6 +136,19 @@ public final class POP3Mail {
             pop3.disconnect();
         } catch (final IOException e) {
             e.printStackTrace();
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isImplicit(String[] args) {
+        return args.length > 4 && Boolean.parseBoolean(args[4]);
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkArgs(String[] args) {
+        if (args.length < 3) {
+            System.err.println("Usage: POP3Mail <server[:port]> <username> <password|-|*|VARNAME> [TLS [true=implicit]]");
+            System.exit(1);
         }
     }
 

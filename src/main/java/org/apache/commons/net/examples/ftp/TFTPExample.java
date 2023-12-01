@@ -85,12 +85,7 @@ public final class TFTPExample {
             }
         }
 
-        // Make sure there are enough arguments
-        if (args.length - argc != 3) {
-            System.err.println("Error: invalid number of arguments.");
-            System.err.print(USAGE);
-            System.exit(1);
-        }
+        enoughArguments(args, argc);
 
         // Get host and file arguments
         hostname = args[argc];
@@ -125,12 +120,27 @@ public final class TFTPExample {
 
         System.out.println("Recd: " + tftp.getTotalBytesReceived() + " Sent: " + tftp.getTotalBytesSent());
 
+        checkClosed(closed);
+
+        System.out.println("OK");
+    }
+
+    //method created to reduce cognitive complexity
+    private static void checkClosed(boolean closed) {
         if (!closed) {
             System.out.println("Failed");
             System.exit(1);
         }
+    }
 
-        System.out.println("OK");
+    //method created to reduce cognitive complexity
+    private static void enoughArguments(String[] args, int argc) {
+        // Make sure there are enough arguments
+        if (args.length - argc != 3) {
+            System.err.println("Error: invalid number of arguments.");
+            System.err.print(USAGE);
+            System.exit(1);
+        }
     }
 
     private static void open(final TFTPClient tftp) throws IOException {

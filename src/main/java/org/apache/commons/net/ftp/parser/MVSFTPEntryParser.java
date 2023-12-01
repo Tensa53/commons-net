@@ -43,6 +43,10 @@ public class MVSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
     static final String DEFAULT_DATE_FORMAT = "yyyy/MM/dd HH:mm"; // 2001/09/18
                                                                   // 13:52
 
+    static final String WHITESPACE_REGEX = "\\S+\\s+";
+
+    static final String PARENTHESES_WHITESPACE_REGEX = "(\\S+)\\s+";
+
     /**
      * Matches these entries:
      *
@@ -53,16 +57,16 @@ public class MVSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
      *
      * @see <a href= "https://www.ibm.com/support/knowledgecenter/zosbasics/com.ibm.zos.zconcepts/zconcepts_159.htm">Data set record formats</a>
      */
-    static final String FILE_LIST_REGEX = "\\S+\\s+" + // volume
+    static final String FILE_LIST_REGEX = WHITESPACE_REGEX + // volume
                                                        // ignored
-            "\\S+\\s+" + // unit - ignored
-            "\\S+\\s+" + // access date - ignored
-            "\\S+\\s+" + // extents -ignored
+            WHITESPACE_REGEX + // unit - ignored
+            WHITESPACE_REGEX + // access date - ignored
+            WHITESPACE_REGEX + // extents -ignored
             // If the values are too large, the fields may be merged (NET-639)
             "(?:\\S+\\s+)?" + // used - ignored
-            "\\S+\\s+" + // recfm - ignored
-            "\\S+\\s+" + // logical record length -ignored
-            "\\S+\\s+" + // block size - ignored
+            WHITESPACE_REGEX + // recfm - ignored
+            WHITESPACE_REGEX + // logical record length -ignored
+            WHITESPACE_REGEX + // block size - ignored
             "(PS|PO|PO-E)\\s+" + // Dataset organisation. Many exist
             // but only support: PS, PO, PO-E
             "(\\S+)\\s*"; // Dataset Name (file name)
@@ -75,14 +79,14 @@ public class MVSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
      *   TBSHELF   01.03 2002/09/12 2002/10/11 09:37    11    11     0 KIL001
      * </pre>
      */
-    static final String MEMBER_LIST_REGEX = "(\\S+)\\s+" + // name
-            "\\S+\\s+" + // version, modification (ignored)
-            "\\S+\\s+" + // create date (ignored)
-            "(\\S+)\\s+" + // modification date
-            "(\\S+)\\s+" + // modification time
-            "\\S+\\s+" + // size in lines (ignored)
-            "\\S+\\s+" + // size in lines at creation(ignored)
-            "\\S+\\s+" + // lines modified (ignored)
+    static final String MEMBER_LIST_REGEX = PARENTHESES_WHITESPACE_REGEX + // name
+            WHITESPACE_REGEX + // version, modification (ignored)
+            WHITESPACE_REGEX + // create date (ignored)
+            PARENTHESES_WHITESPACE_REGEX + // modification date
+            PARENTHESES_WHITESPACE_REGEX + // modification time
+            WHITESPACE_REGEX + // size in lines (ignored)
+            WHITESPACE_REGEX + // size in lines at creation(ignored)
+            WHITESPACE_REGEX + // lines modified (ignored)
             "\\S+\\s*"; // id of user who modified (ignored)
 
     /**
@@ -94,11 +98,11 @@ public class MVSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
      *             1         2         3         4
      * </pre>
      */
-    static final String JES_LEVEL_1_LIST_REGEX = "(\\S+)\\s+" + // job name ignored
-            "(\\S+)\\s+" + // job number
-            "(\\S+)\\s+" + // job status (OUTPUT,INPUT,ACTIVE)
-            "(\\S+)\\s+" + // number of spool files
-            "(\\S+)\\s+" + // Text "Spool" ignored
+    static final String JES_LEVEL_1_LIST_REGEX = PARENTHESES_WHITESPACE_REGEX + // job name ignored
+            PARENTHESES_WHITESPACE_REGEX + // job number
+            PARENTHESES_WHITESPACE_REGEX + // job status (OUTPUT,INPUT,ACTIVE)
+            PARENTHESES_WHITESPACE_REGEX + // number of spool files
+            PARENTHESES_WHITESPACE_REGEX + // Text "Spool" ignored
             "(\\S+)\\s*" // Text "Files" ignored
     ;
 
@@ -138,11 +142,11 @@ public class MVSFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
      * </pre>
      */
 
-    static final String JES_LEVEL_2_LIST_REGEX = "(\\S+)\\s+" + // job name ignored
-            "(\\S+)\\s+" + // job number
-            "(\\S+)\\s+" + // owner ignored
-            "(\\S+)\\s+" + // job status (OUTPUT,INPUT,ACTIVE) ignored
-            "(\\S+)\\s+" + // job class ignored
+    static final String JES_LEVEL_2_LIST_REGEX = PARENTHESES_WHITESPACE_REGEX + // job name ignored
+            PARENTHESES_WHITESPACE_REGEX + // job number
+            PARENTHESES_WHITESPACE_REGEX + // owner ignored
+            PARENTHESES_WHITESPACE_REGEX + // job status (OUTPUT,INPUT,ACTIVE) ignored
+            PARENTHESES_WHITESPACE_REGEX + // job class ignored
             "(\\S+).*" // rest ignored
     ;
 

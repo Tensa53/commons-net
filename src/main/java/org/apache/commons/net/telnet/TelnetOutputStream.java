@@ -80,6 +80,24 @@ final class TelnetOutputStream extends OutputStream {
         }
     }
 
+    //If char is ASCII, process it as such
+    private boolean handleAscii(int ch) throws IOException {
+        if (lastWasCR) {
+            if (convertCRtoCRLF) {
+                client.sendByte('\n');
+                if (ch == '\n') // i.e. was CRLF anyway
+                {
+                    lastWasCR = false;
+                    return false;
+                }
+            } // __convertCRtoCRLF
+            else if (ch != '\n') {
+                client.sendByte('\0'); // RFC854 requires CR NUL for bare CR
+            }
+        }
+        return true;
+    }
+
     /**
      * Writes a byte to the stream.
      *
@@ -94,18 +112,9 @@ final class TelnetOutputStream extends OutputStream {
 
             if (client.requestedWont(TelnetOption.BINARY)) // i.e. ASCII
             {
-                if (lastWasCR) {
-                    if (convertCRtoCRLF) {
-                        client.sendByte('\n');
-                        if (ch == '\n') // i.e. was CRLF anyway
-                        {
-                            lastWasCR = false;
-                            return;
-                        }
-                    } // __convertCRtoCRLF
-                    else if (ch != '\n') {
-                        client.sendByte('\0'); // RFC854 requires CR NUL for bare CR
-                    }
+                if(!handleAscii(ch))
+                {
+                    return;
                 }
 
                 switch (ch) {

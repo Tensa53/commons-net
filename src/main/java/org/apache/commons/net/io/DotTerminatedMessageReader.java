@@ -77,6 +77,38 @@ public final class DotTerminatedMessageReader extends BufferedReader {
         }
     }
 
+    //Called if the next character in the message is .
+    private int dotCase() throws IOException {
+        mark(2); // need to check for CR LF or DOT
+        int chint = super.read();
+        switch (chint) {
+            case NetConstants.EOS:
+                eof = true;
+                return DOT; // return the trailing DOT
+            case DOT:
+                // no need to reset as we want to lose the first DOT
+                return chint; // i.e. DOT
+            case CR:
+                chint = super.read();
+                if (chint == NetConstants.EOS) { // Still only DOT CR - should not happen
+                    reset(); // So CR is picked up next time
+                    return DOT; // return the trailing DOT
+                }
+                if (chint == LF) { // DOT CR LF
+                    atBeginning = true;
+                    eof = true;
+                    // Do we need to clear the mark somehow?
+                    return NetConstants.EOS;
+                }
+                break;
+            default:
+                break;
+        }
+        // Should not happen - lone DOT at beginning
+        reset();
+        return DOT;
+    }
+
     /**
      * Reads and returns the next character in the message. If the end of the message has been reached, returns -1. Note that a call to this method may result
      * in multiple reads from the underlying input stream to decode the message properly (removing doubled dots and so on). All of this is transparent to the
@@ -99,37 +131,7 @@ public final class DotTerminatedMessageReader extends BufferedReader {
             if (atBeginning) {
                 atBeginning = false;
                 if (chint == DOT) { // Have DOT
-                    mark(2); // need to check for CR LF or DOT
-                    chint = super.read();
-                    switch (chint) {
-                    case NetConstants.EOS:
-                        // new Throwable("Trailing DOT").printStackTrace();
-                        eof = true;
-                        return DOT; // return the trailing DOT
-                    case DOT:
-                        // no need to reset as we want to lose the first DOT
-                        return chint; // i.e. DOT
-                    case CR:
-                        chint = super.read();
-                        if (chint == NetConstants.EOS) { // Still only DOT CR - should not happen
-                            // new Throwable("Trailing DOT CR").printStackTrace();
-                            reset(); // So CR is picked up next time
-                            return DOT; // return the trailing DOT
-                        }
-                        if (chint == LF) { // DOT CR LF
-                            atBeginning = true;
-                            eof = true;
-                            // Do we need to clear the mark somehow?
-                            return NetConstants.EOS;
-                        }
-                        break;
-                    default:
-                        break;
-                    }
-                    // Should not happen - lone DOT at beginning
-                    // new Throwable("Lone DOT followed by "+(char)chint).printStackTrace();
-                    reset();
-                    return DOT;
+                    return dotCase();
                 } // have DOT
             } // atBeginning
 

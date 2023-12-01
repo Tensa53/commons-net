@@ -39,7 +39,7 @@ public final class finger {
         InetAddress address = null;
 
         // Get flags. If an invalid flag is present, exit with usage message.
-        while (arg < args.length && args[arg].startsWith("-")) {
+        while (isArgLesserThanArgsLengthAndArgsStartsWith(arg, args)) {
             if (args[arg].equals("-l")) {
                 longOutput = true;
             } else {
@@ -56,21 +56,9 @@ public final class finger {
         if (arg >= args.length) {
             // Finger local host
 
-            try {
-                address = InetAddress.getLocalHost();
-            } catch (final UnknownHostException e) {
-                System.err.println("Error unknown host: " + e.getMessage());
-                System.exit(1);
-            }
+            address = getLocalHostInetAddress();
 
-            try {
-                finger.connect(address);
-                System.out.print(finger.query(longOutput));
-                finger.disconnect();
-            } catch (final IOException e) {
-                System.err.println("Error I/O exception: " + e.getMessage());
-                System.exit(1);
-            }
+            fingerQuery(finger, address, longOutput);
 
             return;
         }
@@ -82,12 +70,7 @@ public final class finger {
 
             if (index == -1) {
                 handle = args[arg];
-                try {
-                    address = InetAddress.getLocalHost();
-                } catch (final UnknownHostException e) {
-                    System.err.println("Error unknown host: " + e.getMessage());
-                    System.exit(1);
-                }
+                address = getLocalHostInetAddress();
             } else {
                 handle = args[arg].substring(0, index);
                 host = args[arg].substring(index + 1);
@@ -101,19 +84,54 @@ public final class finger {
                 }
             }
 
-            try {
-                finger.connect(address);
-                System.out.print(finger.query(longOutput, handle));
-                finger.disconnect();
-            } catch (final IOException e) {
-                System.err.println("Error I/O exception: " + e.getMessage());
-                System.exit(1);
-            }
+            fingerQueryHandle(finger, address, longOutput, handle);
 
             ++arg;
             if (arg != args.length) {
                 System.out.print("\n");
             }
         }
+    }
+    //method created to reduce cognitive complexity
+    private static void fingerQueryHandle(FingerClient finger, InetAddress address, boolean longOutput, String handle) {
+        try {
+            finger.connect(address);
+            System.out.print(finger.query(longOutput, handle));
+            finger.disconnect();
+        } catch (final IOException e) {
+            System.err.println("Error I/O exception: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static void fingerQuery(FingerClient finger, InetAddress address, boolean longOutput) {
+        try {
+            finger.connect(address);
+            System.out.print(finger.query(longOutput));
+            finger.disconnect();
+        } catch (final IOException e) {
+            System.err.println("Error I/O exception: " + e.getMessage());
+            System.exit(1);
+        }
+    }
+
+    //method created to reduce cognitive complexity
+    private static InetAddress getLocalHostInetAddress() {
+        InetAddress inetAddress = null;
+
+        try {
+            inetAddress = InetAddress.getLocalHost();
+        } catch (final UnknownHostException e) {
+            System.err.println("Error unknown host: " + e.getMessage());
+            System.exit(1);
+        }
+
+        return inetAddress;
+    }
+
+    //method created to reduce cognitive complexity
+    private static boolean isArgLesserThanArgsLengthAndArgsStartsWith(int arg, String[] args) {
+        return arg < args.length && args[arg].startsWith("-");
     }
 }

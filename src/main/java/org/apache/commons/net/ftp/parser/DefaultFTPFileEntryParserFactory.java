@@ -105,21 +105,7 @@ public class DefaultFTPFileEntryParserFactory implements FTPFileEntryParserFacto
         FTPFileEntryParser parser = null;
 
         // Is the key a possible class name?
-        if (JAVA_QUALIFIED_NAME_PATTERN.matcher(key).matches()) {
-            try {
-                final Class<?> parserClass = Class.forName(key);
-                try {
-                    parser = (FTPFileEntryParser) parserClass.getConstructor().newInstance();
-                } catch (final ClassCastException e) {
-                    throw new ParserInitializationException(
-                            parserClass.getName() + " does not implement the interface " + "org.apache.commons.net.ftp.FTPFileEntryParser.", e);
-                } catch (final Exception | ExceptionInInitializerError e) {
-                    throw new ParserInitializationException("Error initializing parser", e);
-                }
-            } catch (final ClassNotFoundException e) {
-                // OK, assume it is an alias
-            }
-        }
+        parser = getClassInstanceByKey(key);
 
         if (parser == null) { // Now try for aliases
             final String ukey = key.toUpperCase(java.util.Locale.ENGLISH);
@@ -155,6 +141,30 @@ public class DefaultFTPFileEntryParserFactory implements FTPFileEntryParserFacto
         if (parser instanceof Configurable) {
             ((Configurable) parser).configure(config);
         }
+        return parser;
+    }
+
+    //method created to reduce cognitive complexity
+
+    private FTPFileEntryParser getClassInstanceByKey(String key) {
+        FTPFileEntryParser parser = null;
+
+        if (JAVA_QUALIFIED_NAME_PATTERN.matcher(key).matches()) {
+            try {
+                final Class<?> parserClass = Class.forName(key);
+                try {
+                    parser = (FTPFileEntryParser) parserClass.getConstructor().newInstance();
+                } catch (final ClassCastException e) {
+                    throw new ParserInitializationException(
+                            parserClass.getName() + " does not implement the interface " + "org.apache.commons.net.ftp.FTPFileEntryParser.", e);
+                } catch (final Exception | ExceptionInInitializerError e) {
+                    throw new ParserInitializationException("Error initializing parser", e);
+                }
+            } catch (final ClassNotFoundException e) {
+                // OK, assume it is an alias
+            }
+        }
+
         return parser;
     }
 

@@ -198,6 +198,7 @@ public class NTFTPEntryParserTest extends CompositeFTPParseTestFramework {
         final FTPListParseEngine engine = new FTPListParseEngine(parser);
         engine.readServerList(new ByteArrayInputStream(listFilesByteTrace), charset);
         final FTPFile[] ftpfiles = engine.getFiles();
+        assertEquals(LISTFILE_COUNT, ftpfiles.length);
         return ftpfiles.length;
     }
 
@@ -264,6 +265,6 @@ public class NTFTPEntryParserTest extends CompositeFTPParseTestFramework {
 
     @Override
     public void testRecentPrecision() {
-        // Not used
+        //Not used
     }
 }

@@ -112,6 +112,120 @@ public class TimeInfo {
         comments.add(comment);
     }
 
+    //Performs sanity check on xmitTime and rcvTime, returns accurate delay based on round trip network delay.
+    private long computeDelayValue(long rcvTimeMillis, long xmitTimeMillis, long delayValueMillis)
+    {
+        // assert xmitTime >= rcvTime: difference typically < 1ms
+        if (xmitTimeMillis < rcvTimeMillis) {
+            // server cannot send out a packet before receiving it...
+            comments.add("Error: xmitTime < rcvTime"); // time-travel not allowed
+        } else {
+            // subtract processing time from round-trip network delay
+            final long deltaMillis = xmitTimeMillis - rcvTimeMillis;
+            // in normal cases the processing delta is less than
+            // the total roundtrip network travel time.
+            if (deltaMillis <= delayValueMillis) {
+                delayValueMillis -= deltaMillis; // delay = (t4 - t1) - (t3 - t2)
+            } else // if delta - delayValue == 1 ms then it's a round-off error
+                // e.g. delay=3ms, processing=4ms
+                if (deltaMillis - delayValueMillis == 1) {
+                    // delayValue == 0 -> local clock saw no tick change but destination clock did
+                    if (delayValueMillis != 0) {
+                        comments.add("Info: processing time > total network time by 1 ms -> assume zero delay");
+                        delayValueMillis = 0;
+                    }
+                } else {
+                    comments.add("Warning: processing time > total network time");
+                }
+        }
+        return delayValueMillis;
+    }
+
+    //Used when rcvNtpTime or xmitTime is 0, returns recalculated offsetMillis.
+    private long tryToValidateOffset(TimeStamp rcvNtpTime, TimeStamp xmitNtpTime, long origTimeMillis, long rcvTimeMillis, long xmitTimeMillis)
+    {
+        if (rcvNtpTime.ntpValue() != 0) {
+            // xmitTime is 0 just use rcv time
+            offsetMillis = rcvTimeMillis - origTimeMillis;
+        } else if (xmitNtpTime.ntpValue() != 0) {
+            // rcvTime is 0 just use xmitTime time
+            offsetMillis = xmitTimeMillis - returnTimeMillis;
+        }
+        return offsetMillis;
+    }
+
+    //Return correct delay, or add error comment.
+    private long sanityCheckOriginateDelay(long origTimeMillis)
+    {
+        // assert destTime >= origTime since network delay cannot be negative
+        if (origTimeMillis > returnTimeMillis) {
+            comments.add("Error: OrigTime > DestRcvTime");
+        } else {
+            // without receive or xmit time cannot figure out processing time
+            // so delay is simply the network travel time
+            delayMillis = returnTimeMillis - origTimeMillis;
+        }
+        return delayMillis;
+    }
+
+    //returns true if one of them is missing, false otherwise,
+    private boolean checkMissingRCVOrXMIT(TimeStamp rcvNtpTime, TimeStamp xmitNtpTime)
+    {
+        return(rcvNtpTime.ntpValue() == 0 || xmitNtpTime.ntpValue() == 0);
+    }
+
+    // without originate time cannot determine when packet went out
+    // might be via a broadcast NTP packet...
+    private void handleWithoutOriginateTime(TimeStamp xmitNtpTime, long xmitTimeMillis)
+    {
+        if (xmitNtpTime.ntpValue() != 0) {
+            offsetMillis = xmitTimeMillis - returnTimeMillis;
+            comments.add("Error: zero orig time -- cannot compute delay");
+        } else {
+            comments.add("Error: zero orig time -- cannot compute delay/offset");
+        }
+    }
+
+    /*
+     * Round-trip network delay and local clock offset (or time drift) is calculated according to this standard NTP equation:
+     *
+     * LocalClockOffset = ((ReceiveTimestamp - OriginateTimestamp) + (TransmitTimestamp - DestinationTimestamp)) / 2
+     *
+     * equations from RFC-1305 (NTPv3) roundtrip delay = (t4 - t1) - (t3 - t2) local clock offset = ((t2 - t1) + (t3 - t4)) / 2
+     *
+     * It takes into account network delays and assumes that they are symmetrical.
+     *
+     * Note the typo in SNTP RFCs 1769/2030 which state that the delay is (T4 - T1) - (T2 - T3) with the "T2" and "T3" switched.
+     */
+    private void computeClockDetails(TimeStamp origNtpTime, TimeStamp rcvNtpTime, TimeStamp xmitNtpTime)
+    {
+
+        final long origTimeMillis = origNtpTime.getTime();
+        final long rcvTimeMillis = rcvNtpTime.getTime();
+        final long xmitTimeMillis = xmitNtpTime.getTime();
+
+        if (origNtpTime.ntpValue() == 0) {
+            handleWithoutOriginateTime(xmitNtpTime, xmitTimeMillis);
+        } else if (checkMissingRCVOrXMIT(rcvNtpTime, xmitNtpTime)) {
+            comments.add("Warning: zero rcvNtpTime or xmitNtpTime");
+            offsetMillis = sanityCheckOriginateDelay(origTimeMillis);
+            // TODO: is offset still valid if rcvNtpTime=0 || xmitNtpTime=0 ???
+            // Could always hash origNtpTime (sendTime) but if host doesn't set it
+            // then it's an malformed ntp host anyway and we don't care?
+            // If server is in broadcast mode then we never send out a query in first place...
+            offsetMillis = tryToValidateOffset(rcvNtpTime, xmitNtpTime, origTimeMillis, rcvTimeMillis, xmitTimeMillis);
+        } else {
+            long delayValueMillis = returnTimeMillis - origTimeMillis;
+            delayValueMillis = computeDelayValue(rcvTimeMillis, xmitTimeMillis, delayValueMillis);
+            delayMillis = delayValueMillis;
+            if (origTimeMillis > returnTimeMillis) {
+                comments.add("Error: OrigTime > DestRcvTime");
+            }
+
+            offsetMillis = (rcvTimeMillis - origTimeMillis + xmitTimeMillis - returnTimeMillis) / 2;
+        }
+    }
+
     /**
      * Compute and validate details of the NTP message packet. Computed fields include the offset and delay.
      */
@@ -125,89 +239,14 @@ public class TimeInfo {
         }
 
         final TimeStamp origNtpTime = message.getOriginateTimeStamp();
-        final long origTimeMillis = origNtpTime.getTime();
 
         // Receive Time is time request received by server (t2)
         final TimeStamp rcvNtpTime = message.getReceiveTimeStamp();
-        final long rcvTimeMillis = rcvNtpTime.getTime();
 
         // Transmit time is time reply sent by server (t3)
         final TimeStamp xmitNtpTime = message.getTransmitTimeStamp();
-        final long xmitTimeMillis = xmitNtpTime.getTime();
 
-        /*
-         * Round-trip network delay and local clock offset (or time drift) is calculated according to this standard NTP equation:
-         *
-         * LocalClockOffset = ((ReceiveTimestamp - OriginateTimestamp) + (TransmitTimestamp - DestinationTimestamp)) / 2
-         *
-         * equations from RFC-1305 (NTPv3) roundtrip delay = (t4 - t1) - (t3 - t2) local clock offset = ((t2 - t1) + (t3 - t4)) / 2
-         *
-         * It takes into account network delays and assumes that they are symmetrical.
-         *
-         * Note the typo in SNTP RFCs 1769/2030 which state that the delay is (T4 - T1) - (T2 - T3) with the "T2" and "T3" switched.
-         */
-        if (origNtpTime.ntpValue() == 0) {
-            // without originate time cannot determine when packet went out
-            // might be via a broadcast NTP packet...
-            if (xmitNtpTime.ntpValue() != 0) {
-                offsetMillis = Long.valueOf(xmitTimeMillis - returnTimeMillis);
-                comments.add("Error: zero orig time -- cannot compute delay");
-            } else {
-                comments.add("Error: zero orig time -- cannot compute delay/offset");
-            }
-        } else if (rcvNtpTime.ntpValue() == 0 || xmitNtpTime.ntpValue() == 0) {
-            comments.add("Warning: zero rcvNtpTime or xmitNtpTime");
-            // assert destTime >= origTime since network delay cannot be negative
-            if (origTimeMillis > returnTimeMillis) {
-                comments.add("Error: OrigTime > DestRcvTime");
-            } else {
-                // without receive or xmit time cannot figure out processing time
-                // so delay is simply the network travel time
-                delayMillis = Long.valueOf(returnTimeMillis - origTimeMillis);
-            }
-            // TODO: is offset still valid if rcvNtpTime=0 || xmitNtpTime=0 ???
-            // Could always hash origNtpTime (sendTime) but if host doesn't set it
-            // then it's an malformed ntp host anyway and we don't care?
-            // If server is in broadcast mode then we never send out a query in first place...
-            if (rcvNtpTime.ntpValue() != 0) {
-                // xmitTime is 0 just use rcv time
-                offsetMillis = Long.valueOf(rcvTimeMillis - origTimeMillis);
-            } else if (xmitNtpTime.ntpValue() != 0) {
-                // rcvTime is 0 just use xmitTime time
-                offsetMillis = Long.valueOf(xmitTimeMillis - returnTimeMillis);
-            }
-        } else {
-            long delayValueMillis = returnTimeMillis - origTimeMillis;
-            // assert xmitTime >= rcvTime: difference typically < 1ms
-            if (xmitTimeMillis < rcvTimeMillis) {
-                // server cannot send out a packet before receiving it...
-                comments.add("Error: xmitTime < rcvTime"); // time-travel not allowed
-            } else {
-                // subtract processing time from round-trip network delay
-                final long deltaMillis = xmitTimeMillis - rcvTimeMillis;
-                // in normal cases the processing delta is less than
-                // the total roundtrip network travel time.
-                if (deltaMillis <= delayValueMillis) {
-                    delayValueMillis -= deltaMillis; // delay = (t4 - t1) - (t3 - t2)
-                } else // if delta - delayValue == 1 ms then it's a round-off error
-                // e.g. delay=3ms, processing=4ms
-                if (deltaMillis - delayValueMillis == 1) {
-                    // delayValue == 0 -> local clock saw no tick change but destination clock did
-                    if (delayValueMillis != 0) {
-                        comments.add("Info: processing time > total network time by 1 ms -> assume zero delay");
-                        delayValueMillis = 0;
-                    }
-                } else {
-                    comments.add("Warning: processing time > total network time");
-                }
-            }
-            delayMillis = Long.valueOf(delayValueMillis);
-            if (origTimeMillis > returnTimeMillis) {
-                comments.add("Error: OrigTime > DestRcvTime");
-            }
-
-            offsetMillis = Long.valueOf((rcvTimeMillis - origTimeMillis + xmitTimeMillis - returnTimeMillis) / 2);
-        }
+        computeClockDetails(origNtpTime, rcvNtpTime, xmitNtpTime);
     }
 
     /**
