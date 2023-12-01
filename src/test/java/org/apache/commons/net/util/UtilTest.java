@@ -104,7 +104,6 @@ public class UtilTest {
         Util.closeQuietly((Closeable) null);
         Util.closeQuietly((Socket) null);
         //If exception is launched, this test will fail. Otherwise, exception suppressed, therefore success.
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -185,7 +184,6 @@ public class UtilTest {
         final int bufferSize = -1;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -194,7 +192,6 @@ public class UtilTest {
         final int bufferSize = 0;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -203,7 +200,6 @@ public class UtilTest {
         final int bufferSize = 1;
         Util.copyReader(source, dest, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -212,7 +208,6 @@ public class UtilTest {
         final int bufferSize = -1;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -221,7 +216,6 @@ public class UtilTest {
         final int bufferSize = 0;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 
     @Test
@@ -230,6 +224,5 @@ public class UtilTest {
         final int bufferSize = 1;
         Util.copyStream(src, dst, bufferSize, streamSize, new CSL(1, 1, streamSize));
         //No exception launched, test is correct
-        Assert.assertTrue(true);
     }
 }
