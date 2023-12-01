@@ -553,41 +553,39 @@ final class TelnetInputStream extends BufferedInputStream implements Runnable {
         }
     }
 
+    private void processchFromQueue() throws IOException {
+        int ch = 0;
+        while (!isClosed && ch >= 0) {
+            try {
+               ch = read(true);
+            } catch (final InterruptedIOException e) {
+                synchronized (queue) {
+                    ioException = e;
+                    queue.notifyAll();
+                    try {
+                        queue.wait(100);
+                    } catch (final InterruptedException interrupted) {
+                        throw new IOException();
+                    }
+                }
+            } catch (final RuntimeException re) {
+                // We treat any runtime exceptions as though the
+                // stream has been closed. We close the
+                // underlying stream just to be sure.
+                super.close();
+                // Breaking the loop has the effect of setting
+                // the state to closed at the end of the method.
+                break;
+            }
+            // Process new character
+            trytoNotify(ch);
+        }
+    }
+
     @Override
     public void run() {
-        int ch;
         try {
-            while (!isClosed) {
-                try {
-                    if ((ch = read(true)) < 0) {
-                        break;
-                    }
-                } catch (final InterruptedIOException e) {
-                    synchronized (queue) {
-                        ioException = e;
-                        queue.notifyAll();
-                        try {
-                            queue.wait(100);
-                        } catch (final InterruptedException interrupted) {
-                            if (isClosed) {
-                                break;
-                            }
-                        }
-                        continue;
-                    }
-                } catch (final RuntimeException re) {
-                    // We treat any runtime exceptions as though the
-                    // stream has been closed. We close the
-                    // underlying stream just to be sure.
-                    super.close();
-                    // Breaking the loop has the effect of setting
-                    // the state to closed at the end of the method.
-                    break;
-                }
-
-                // Process new character
-                trytoNotify(ch);
-            }
+            processchFromQueue();
         } catch (final IOException ioe) {
             synchronized (queue) {
                 ioException = ioe;

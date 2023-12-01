@@ -131,7 +131,7 @@ public final class IMAPImportMbox {
                 boolean wanted = false; // Skip any leading rubbish
                 while ((line = br.readLine()) != null) {
                     if (line.startsWith("From ")) { // start of message; i.e. end of previous (if any)
-                        loaded+= processableMessageCounterUp(line, sb, imap, folder, total);
+                        loaded+= processableMessageCounterUp(sb, imap, folder, total);
                         sb.setLength(0);
                         total++;
                         wanted = wanted(total, line, msgNums, contains);
@@ -161,7 +161,7 @@ public final class IMAPImportMbox {
         }
 
     //method created to reduce cognitive complexity
-    private static int processableMessageCounterUp(String line, StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
+    private static int processableMessageCounterUp(StringBuilder sb, IMAPClient imap, String folder, int total) throws IOException {
         if (process(sb, imap, folder, total)) { // process previous message (if any)
             return 1;
         }

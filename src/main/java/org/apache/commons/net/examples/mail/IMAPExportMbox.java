@@ -321,25 +321,6 @@ public final class IMAPExportMbox {
                 break;
         }
 
-//        if (file.equals("-")) {
-//            mboxListener = null;
-//        } else if (file.startsWith("+")) {
-//            final File mbox = new File(file.substring(1));
-//            System.out.println("Appending to file " + mbox);
-//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, true)), eol, printHash, printMarker, checkSequence);
-//        } else if (file.startsWith("-")) {
-//            final File mbox = new File(file.substring(1));
-//            System.out.println("Writing to file " + mbox);
-//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mbox, false)), eol, printHash, printMarker, checkSequence);
-//        } else {
-//            final File mboxFile = new File(file);
-//            if (isMboxFileExistent(mboxFile)) {
-//                throw new IOException("mailbox file: " + mboxFile + " already exists and is non-empty!");
-//            }
-//            System.out.println("Creating file " + mboxFile);
-//            mboxListener = new MboxListener(new BufferedWriter(new FileWriter(mboxFile)), eol, printHash, printMarker, checkSequence);
-//        }
-
         final String path = uri.getPath();
 
         isPathNull(path);
@@ -378,14 +359,14 @@ public final class IMAPExportMbox {
 
             throw ioe;
         } finally {
-            finallyFetch(printHash, mboxListener, imap);
+            finallyFetch(printHash, mboxListener);
             imap.logout();
             imap.disconnect();
         }
 
         printProcessedMessages(mboxListener);
 
-        printFolderContainedMessages(mboxListener, maxIndexInFolder);
+        printFolderContainedMessages(maxIndexInFolder);
     }
 
     //method created to reduce cognitive complexity
@@ -408,8 +389,7 @@ public final class IMAPExportMbox {
     }
 
     //method created to reduce cognitive complexity
-    private static void finallyFetch(boolean printHash, MboxListener mboxListener,
-                                     IMAPClient imap) throws IOException {
+    private static void finallyFetch(boolean printHash, MboxListener mboxListener) throws IOException {
         if (printHash) {
             System.err.println();
         }
@@ -494,7 +474,7 @@ public final class IMAPExportMbox {
     }
 
     //method created to reduce cognitive complexity
-    private static void printFolderContainedMessages(MboxListener mboxListener, String maxIndexInFolder) {
+    private static void printFolderContainedMessages(String maxIndexInFolder) {
         if (maxIndexInFolder != null) {
             System.out.println("Folder contained " + maxIndexInFolder + " messages.");
         }
