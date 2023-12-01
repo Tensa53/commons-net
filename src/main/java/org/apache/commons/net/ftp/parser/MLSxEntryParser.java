@@ -251,7 +251,7 @@ public class MLSxEntryParser extends FTPFileEntryParserImpl {
             if (file == null){
                 return null;
             } else {
-                file = setFTPFileUserGroupPermission(file, factname, factvalue);
+                setFTPFileUserGroupPermission(file, factname, factvalue);
             }
         } // unix.
         else if (isNotUnixModeAndPermEqualsFactname(hasUnixMode, factname)) { // skip if we have the UNIX.mode

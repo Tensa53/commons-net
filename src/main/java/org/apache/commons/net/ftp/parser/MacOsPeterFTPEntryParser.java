@@ -102,7 +102,6 @@ public class MacOsPeterFTPEntryParser extends ConfigurableFTPFileEntryParserImpl
     @Override
     public FTPFile parseFTPEntry(final String entry) {
         final FTPFile file;
-        final int type;
         boolean isDevice = false;
 
         if (matches(entry)) {

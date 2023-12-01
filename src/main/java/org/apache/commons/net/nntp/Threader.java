@@ -257,7 +257,7 @@ public class Threader {
         {
             final String[] references = threadable.messageThreadReferences();
             for (final String refString : references) {
-                NntpThreadContainer ref = idTable.get(refString);
+                NntpThreadContainer ref = idTable.computeIfAbsent(refString, value -> new NntpThreadContainer());
 
                 // if this id doesn't have a container, create one
                 if (ref == null) {

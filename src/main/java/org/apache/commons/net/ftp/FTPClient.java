@@ -747,7 +747,7 @@ public class FTPClient extends FTP implements Configurable {
     }
 
     private boolean parseExtendedElseParsePassive(boolean attemptEPSV, boolean isInet6Address) throws IOException {
-        if (isAttempEPSVAndEpsvEqualsENTERING_EPSV(attemptEPSV)) {
+        if (isAttempEPSVAndEpsvEqualsENTERINGEPSV(attemptEPSV)) {
             _parseExtendedPassiveModeReply(_replyLines.get(0));
         } else {
             if (isInet6Address) {
@@ -847,7 +847,7 @@ public class FTPClient extends FTP implements Configurable {
     }
 
     //method created to reduce cognitive complexity
-    private boolean isAttempEPSVAndEpsvEqualsENTERING_EPSV(boolean attemptEPSV) throws IOException {
+    private boolean isAttempEPSVAndEpsvEqualsENTERINGEPSV(boolean attemptEPSV) throws IOException {
         return attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE;
     }
 
