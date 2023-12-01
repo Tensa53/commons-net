@@ -64,7 +64,7 @@ public class OS400FTPEntryParserAdditionalTest extends CompositeFTPParseTestFram
 
     @Override
     public void testDefaultPrecision() {
-        assertTrue(true);// Done in other class
+        // Done in other class
     }
 
     @Override
@@ -110,6 +110,6 @@ public class OS400FTPEntryParserAdditionalTest extends CompositeFTPParseTestFram
 
     @Override
     public void testRecentPrecision() {
-        assertTrue(true);// Done in other class
+        // Done in other class
     }
 }

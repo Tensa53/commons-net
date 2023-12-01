@@ -265,6 +265,6 @@ public class NTFTPEntryParserTest extends CompositeFTPParseTestFramework {
 
     @Override
     public void testRecentPrecision() {
-        assertTrue(true); //Unused
+        //Not used
     }
 }
