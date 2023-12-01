@@ -288,7 +288,9 @@ public class OS400FTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
         if (!isNullOrEmpty(group(3)) || !isNullOrEmpty(group(4))) {
            return group(3) + " " + group(4);
         }
-        else return "";
+        else {
+            return "";
+        }
     }
 
     //Called inside parseFTPEntry, sets a file's timestamp using the String containing its date
@@ -352,7 +354,10 @@ public class OS400FTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
         {
             return false;
         }
-        else return !typeStr.equalsIgnoreCase("*MEM");
+        else
+        {
+            return !typeStr.equalsIgnoreCase("*MEM");
+        }
     }
 
     //Returns new appropriate filename based on filetype
