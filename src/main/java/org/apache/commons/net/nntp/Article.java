@@ -226,12 +226,82 @@ public class Article implements Threadable {
 
     // DEPRECATED METHODS - for API compatibility only - DO NOT USE
 
+
+    //Returns new position after the numbers
+    private int skipNumbers(int i, int len)
+    {
+        while (i < len && subject.charAt(i) >= '0' && subject.charAt(i) <= '9') {
+           i++;
+        }
+        return i;
+    }
+
+    //Must be checked after open parentheses, is either closed parentheses or semicolon.
+    //Current position is i, NOT start.
+    private boolean checkClose(int i, int len)
+    {
+        return(i < len - 1 && (subject.charAt(i) == ']' || subject.charAt(i) == ')') && subject.charAt(i + 1) == ':');
+    }
+
+    private boolean checkOpenParentheses(int start, int len)
+    {
+        return (start < len - 2 && (subject.charAt(start + 2) == '[' || subject.charAt(start + 2) == '('));
+    }
+
+    //Requires previous assignment of subject. Checks for case-insensitive re.
+    private boolean checkRE(int start, int len)
+    {
+       return (start < len - 2 && (subject.charAt(start) == 'r' || subject.charAt(start) == 'R')
+                && (subject.charAt(start + 1) == 'e' || subject.charAt(start + 1) == 'E'));
+    }
+
+    //Returns first character after whitespace
+    // "Re: " breaks this
+
+    private int skipStartWhitespace(int len)
+    {
+        int start = 0;
+        while (start < len && subject.charAt(start) == ' ') {
+            start++;
+        }
+        return start;
+    }
+
+    private int skipEndWhitespace(int start, int len)
+    {
+        int end = len;
+        while (end > start && subject.charAt(end - 1) < ' ') {
+            end--;
+        }
+        return end;
+    }
+
+    //if subject is (no subject), return appropriately empty subject for simplification.
+    private String checkEmptySubject(String simplifiedSubject)
+    {
+        if ("(no subject)".equals(simplifiedSubject)) {
+            simplifiedSubject = "";
+        }
+        return simplifiedSubject;
+    }
+
+    //Returns simplified subject if possible
+    private String checkPossibileSimplification(String subject, int start, int end, int len)
+    {
+        String newSubject;
+        if (start == 0 && end == len) {
+            newSubject = subject;
+        } else {
+            newSubject = subject.substring(start, end);
+        }
+        return newSubject;
+    }
+
     /**
      * Attempts to parse the subject line for some typical reply signatures, and strip them out
      *
      */
     private void simplifySubject() {
-        int start = 0;
         final String subject = getSubject();
         final int len = subject.length();
 
@@ -240,48 +310,29 @@ public class Article implements Threadable {
         while (!done) {
             done = true;
 
-            // skip whitespace
-            // "Re: " breaks this
-            while (start < len && subject.charAt(start) == ' ') {
-                start++;
-            }
+            int start = skipStartWhitespace(len);
 
-            if (start < len - 2 && (subject.charAt(start) == 'r' || subject.charAt(start) == 'R')
-                    && (subject.charAt(start + 1) == 'e' || subject.charAt(start + 1) == 'E')) {
+            if(checkRE(start, len)){
 
                 if (subject.charAt(start + 2) == ':') {
                     start += 3; // Skip "Re:"
                     done = false;
-                } else if (start < len - 2 && (subject.charAt(start + 2) == '[' || subject.charAt(start + 2) == '(')) {
+                } else if (checkOpenParentheses(start, len)) {
 
-                    int i = start + 3;
+                    int i = skipNumbers(start + 3, len);
 
-                    while (i < len && subject.charAt(i) >= '0' && subject.charAt(i) <= '9') {
-                        i++;
-                    }
-
-                    if (i < len - 1 && (subject.charAt(i) == ']' || subject.charAt(i) == ')') && subject.charAt(i + 1) == ':') {
+                    if (checkClose(start, len)) {
                         start = i + 2;
                         done = false;
                     }
                 }
             }
 
-            if ("(no subject)".equals(simplifiedSubject)) {
-                simplifiedSubject = "";
-            }
+            simplifiedSubject = checkEmptySubject(simplifiedSubject);
 
-            int end = len;
+            int end = skipEndWhitespace(start, len);
 
-            while (end > start && subject.charAt(end - 1) < ' ') {
-                end--;
-            }
-
-            if (start == 0 && end == len) {
-                simplifiedSubject = subject;
-            } else {
-                simplifiedSubject = subject.substring(start, end);
-            }
+            simplifiedSubject = checkPossibileSimplification(subject, start, end, len);
         }
     }
 
