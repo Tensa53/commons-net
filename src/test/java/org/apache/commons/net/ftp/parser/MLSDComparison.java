@@ -17,21 +17,22 @@
 
 package org.apache.commons.net.ftp.parser;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FilenameFilter;
-import java.io.InputStream;
+import java.io.*;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Comparator;
 import java.util.TimeZone;
 
+import junit.framework.Assert;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClientConfig;
 import org.apache.commons.net.ftp.FTPFile;
 import org.apache.commons.net.ftp.FTPFileFilters;
 import org.apache.commons.net.ftp.FTPListParseEngine;
 import org.junit.Test;
+
+import static junit.framework.TestCase.assertTrue;
+import static junit.framework.TestCase.fail;
 
 /**
  * Attempt comparison of LIST and MLSD listings
@@ -173,7 +174,7 @@ public class MLSDComparison {
     }
 
     @Test
-    public void testFile() throws Exception {
+    public void testFile() {
         final File path = new File(DownloadListings.DOWNLOAD_DIR);
         final FilenameFilter filter = (dir, name) -> name.endsWith("_mlsd.txt");
         final File[] files = path.listFiles(filter);
@@ -183,8 +184,17 @@ public class MLSDComparison {
                 FTPListParseEngine engine = new FTPListParseEngine(MLSxEntryParser.getInstance());
                 try (final InputStream is = new FileInputStream(mlsd)) {
                     engine.readServerList(is, FTP.DEFAULT_CONTROL_ENCODING);
+                }catch (FileNotFoundException e) {
+                    fail("readServerList failed");
+                }catch (IOException e) {
+                    fail("readServerList failed");
                 }
-                final FTPFile[] mlsds = engine.getFiles(FTPFileFilters.ALL);
+                FTPFile[] mlsds=new FTPFile[0];
+                try {
+                    mlsds = engine.getFiles(FTPFileFilters.ALL);
+                } catch (IOException e) {
+                    Assert.fail("getFiles failed");
+                }
                 final File listFile = new File(mlsd.getParentFile(), mlsd.getName().replace("_mlsd", "_list"));
                 try (final InputStream inputStream = new FileInputStream(listFile)) {
                     final FTPClientConfig cfg = new FTPClientConfig();
@@ -193,9 +203,17 @@ public class MLSDComparison {
                     engine = new FTPListParseEngine(parser);
                     engine.readServerList(inputStream, FTP.DEFAULT_CONTROL_ENCODING);
                     compareSortedLists(mlsds, engine.getFiles(FTPFileFilters.ALL));
+                }catch (FileNotFoundException e) {
+                    fail("execution failed, exeception message: " + e.getMessage());
+                }catch (IOException e) {
+                    fail("execution failed, exeception message: " + e.getMessage());
                 }
             }
+
+            assertTrue("Files testing succeded",true);
         }
+
+        fail("unable to retrieve files");
     }
 
 //    private boolean areSame(int a, int b, int d) {

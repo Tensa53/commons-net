@@ -564,16 +564,15 @@ public class FTP extends SocketClient {
 
         String line = _controlInput_.readLine();
 
-        if (line == null) {
-            throw new FTPConnectionClosedException("Connection closed without indication.");
-        }
+        //method created to reduce cognitive complexity
+        isLineNull(line);
 
         // In case we run into an anomaly we don't want fatal index exceptions
         // to be thrown.
+        //method created to reduce cognitive complexity
         length = line.length();
-        if (length < REPLY_CODE_LEN) {
-            throw new MalformedServerReplyException("Truncated server reply: " + line);
-        }
+
+        isLenghtLesserThanReplyCodeLen(length, line);
 
         String code;
         try {
@@ -593,16 +592,15 @@ public class FTP extends SocketClient {
                 do {
                     line = _controlInput_.readLine();
 
-                    if (line == null) {
-                        throw new FTPConnectionClosedException("Connection closed without indication.");
-                    }
+                    isLineNull(line);
 
                     _replyLines.add(line);
 
                     // The length() check handles problems that could arise from readLine()
                     // returning too soon after encountering a naked CR or some other
                     // anomaly.
-                } while (isStrictMultilineParsing() ? strictCheck(line, code) : lenientCheck(line));
+                } while (isaBoolean(line, code));
+
 
             } else if (isStrictReplyParsing()) {
                 if (length == REPLY_CODE_LEN + 1) { // expecting some text
@@ -616,14 +614,41 @@ public class FTP extends SocketClient {
             throw new MalformedServerReplyException("Truncated server reply: '" + line + "'");
         }
 
-        if (reportReply) {
-            fireReplyReceived(_replyCode, getReplyString());
-        }
 
+        isReportReplyThenfireReplyReceived(reportReply);
+
+
+        isReplyCodeEqualsServiceNotAvailable();
+
+        return _replyCode;
+    }
+
+    private void isReplyCodeEqualsServiceNotAvailable() throws FTPConnectionClosedException {
         if (_replyCode == FTPReply.SERVICE_NOT_AVAILABLE) {
             throw new FTPConnectionClosedException("FTP response 421 received.  Server closed connection.");
         }
-        return _replyCode;
+    }
+
+    private void isReportReplyThenfireReplyReceived(boolean reportReply) {
+        if (reportReply) {
+            fireReplyReceived(_replyCode, getReplyString());
+        }
+    }
+
+    private boolean isaBoolean(String line, String code) {
+        return isStrictMultilineParsing() ? strictCheck(line, code) : lenientCheck(line);
+    }
+
+    private void isLenghtLesserThanReplyCodeLen(int length, String line) throws MalformedServerReplyException {
+        if (length < REPLY_CODE_LEN) {
+            throw new MalformedServerReplyException("Truncated server reply: " + line);
+        }
+    }
+
+    private void isLineNull(String line) throws FTPConnectionClosedException {
+        if (line == null) {
+            throw new FTPConnectionClosedException("Connection closed without indication.");
+        }
     }
 
     /**

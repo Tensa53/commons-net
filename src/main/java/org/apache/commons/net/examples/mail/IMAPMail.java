@@ -45,6 +45,8 @@ public final class IMAPMail {
 
         final URI uri = URI.create(args[0]);
 
+        final String INBOX = "inbox";
+
         // Connect and login
         final IMAPClient imap = IMAPUtils.imapLogin(uri, 10000, null);
 
@@ -56,11 +58,11 @@ public final class IMAPMail {
 
             imap.capability();
 
-            imap.select("inbox");
+            imap.select(INBOX);
 
-            imap.examine("inbox");
+            imap.examine(INBOX);
 
-            imap.status("inbox", new String[] { "MESSAGES" });
+            imap.status(INBOX, new String[] { "MESSAGES" });
 
             imap.list("", "*"); // Show the folders
 
