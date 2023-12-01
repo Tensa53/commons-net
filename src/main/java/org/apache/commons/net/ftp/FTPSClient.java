@@ -748,7 +748,7 @@ public class FTPSClient extends FTPClient {
             // while EPSV would make the client succeed by taking just the port.
             final boolean attemptEPSV = isUseEPSWithIPV4OrIsNetAddress(isInet6Address);
 
-            if(!(parseExtendedElseParsePassive(attemptEPSV, isInet6Address))){
+            if(!(parseExtendedElseParsePassiveS(attemptEPSV, isInet6Address))){
                 return null;
             }
 
@@ -756,7 +756,7 @@ public class FTPSClient extends FTPClient {
 
             sslSocket = createSecureSSLSocket(socket);
 
-            if (isResatrtOffsetGreaterThanZeroAndIsNotRestarted()) {
+            if (isResatrtOffsetGreaterThanZeroAndIsNotRestartedS()) {
                 closeSockets(socket, sslSocket);
                 return null;
             }
@@ -767,7 +767,7 @@ public class FTPSClient extends FTPClient {
             }
         }
 
-        if (isRemoteVerificationEnableAndNotVerifiedRemote(socket)) {
+        if (isRemoteVerificationEnableAndNotVerifiedRemoteS(socket)) {
             // Grab the host before we close the socket to avoid NET-663
             final InetAddress socketHost = socket.getInetAddress();
 
@@ -822,8 +822,8 @@ public class FTPSClient extends FTPClient {
     }
 
     //method created to reduce cognitive complexity
-    private boolean parseExtendedElseParsePassive(boolean attemptEPSV, boolean isInet6Address) throws IOException {
-        if (isAttempEPSVAndEpsbEqualsENTERING_EPSV(attemptEPSV)) {
+    private boolean parseExtendedElseParsePassiveS(boolean attemptEPSV, boolean isInet6Address) throws IOException {
+        if (isAttempEPSVAndEpsbEqualsENTERINGEPSV(attemptEPSV)) {
             _parseExtendedPassiveModeReply(_replyLines.get(0));
         } else {
             if (isInet6Address) {
@@ -840,7 +840,7 @@ public class FTPSClient extends FTPClient {
     }
 
     //method created to reduce cognitive complexity
-    private boolean isAttempEPSVAndEpsbEqualsENTERING_EPSV(boolean attemptEPSV) throws IOException {
+    private boolean isAttempEPSVAndEpsbEqualsENTERINGEPSV(boolean attemptEPSV) throws IOException {
         return attemptEPSV && epsv() == FTPReply.ENTERING_EPSV_MODE;
     }
 
@@ -850,7 +850,7 @@ public class FTPSClient extends FTPClient {
     }
 
     //method created to reduce cognitive complexity
-    private boolean isRemoteVerificationEnableAndNotVerifiedRemote(Socket socket) {
+    private boolean isRemoteVerificationEnableAndNotVerifiedRemoteS(Socket socket) {
         return isRemoteVerificationEnabled() && !verifyRemote(socket);
     }
 
@@ -865,7 +865,7 @@ public class FTPSClient extends FTPClient {
             return null;
         }
 
-        if (isResatrtOffsetGreaterThanZeroAndIsNotRestarted()) {
+        if (isResatrtOffsetGreaterThanZeroAndIsNotRestartedS()) {
             return null;
         }
 
@@ -898,7 +898,7 @@ public class FTPSClient extends FTPClient {
     }
 
     //method created to reduce cognitive complexity
-    private boolean isResatrtOffsetGreaterThanZeroAndIsNotRestarted() throws IOException {
+    private boolean isResatrtOffsetGreaterThanZeroAndIsNotRestartedS() throws IOException {
         return getRestartOffset() > 0 && !restart(getRestartOffset());
     }
 
