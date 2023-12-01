@@ -359,6 +359,18 @@ class Telnet extends SocketClient {
         }
     }
 
+    //Returns true if it should accept a new state or false otherwise, according to the telnet option passed.
+    private boolean getStateFromTelnetOptionHandler(int option)
+    {
+        boolean acceptNewState = false;
+        if (optionHandlers[option] != null) {
+            acceptNewState = optionHandlers[option].getAcceptLocal();
+        } else if (option == TERMINAL_TYPE && terminalType != null && !terminalType.isEmpty()) {
+            acceptNewState = true;
+        }
+        return acceptNewState;
+    }
+
     /**
      * Processes a {@code DO} request.
      *
@@ -374,14 +386,8 @@ class Telnet extends SocketClient {
             notifhand.receivedNegotiation(TelnetNotificationHandler.RECEIVED_DO, option);
         }
 
-        boolean acceptNewState = false;
-
         /* open TelnetOptionHandler functionality (start) */
-        if (optionHandlers[option] != null) {
-            acceptNewState = optionHandlers[option].getAcceptLocal();
-        } else if (option == TERMINAL_TYPE && terminalType != null && !terminalType.isEmpty()) {
-            acceptNewState = true;
-        }
+       boolean acceptNewState = getStateFromTelnetOptionHandler(option);
         /* TERMINAL-TYPE option (end) */
         /* open TelnetOptionHandler functionality (start) */
 
@@ -392,15 +398,7 @@ class Telnet extends SocketClient {
             }
         }
 
-        if (willResponse[option] == 0) {
-            if (requestedWont(option)) {
-
-                switch (option) {
-
-                default:
-                    break;
-
-                }
+        if (willResponse[option] == 0 && (requestedWont(option))) {
 
                 if (acceptNewState) {
                     setWantWill(option);
@@ -409,17 +407,8 @@ class Telnet extends SocketClient {
                     ++willResponse[option];
                     sendWont(option);
                 }
-            } else {
-                // Other end has acknowledged option.
+              // Other end has acknowledged option.
 
-                switch (option) {
-
-                default:
-                    break;
-
-                }
-
-            }
         }
 
         setWill(option);
@@ -466,6 +455,16 @@ class Telnet extends SocketClient {
         setWont(option);
     }
 
+    //If it should print in debug the suboptions passed, then it does so.
+    private void checkSuboptionDebug(int[] suboption, int suboptionLength)
+    {
+        if (debug) {
+            for (int ii = 0; ii < suboptionLength; ii++) {
+                System.err.println("SUB[" + ii + "]: " + suboption[ii]);
+            }
+        }
+    }
+
     /* TERMINAL-TYPE option (start) */
     /**
      * Processes a suboption negotiation.
@@ -485,11 +484,7 @@ class Telnet extends SocketClient {
                 final int[] responseSuboption = optionHandlers[suboption[0]].answerSubnegotiation(suboption, suboptionLength);
                 _sendSubnegotiation(responseSuboption);
             } else if (suboptionLength > 1) {
-                if (debug) {
-                    for (int ii = 0; ii < suboptionLength; ii++) {
-                        System.err.println("SUB[" + ii + "]: " + suboption[ii]);
-                    }
-                }
+                checkSuboptionDebug(suboption, suboptionLength);
                 if (suboption[0] == TERMINAL_TYPE && suboption[1] == TERMINAL_TYPE_SEND) {
                     sendTerminalType();
                 }
@@ -529,13 +524,6 @@ class Telnet extends SocketClient {
         }
 
         if (doResponse[option] == 0 && requestedDont(option)) {
-
-            switch (option) {
-
-            default:
-                break;
-
-            }
 
             if (acceptNewState) {
                 setWantDo(option);
