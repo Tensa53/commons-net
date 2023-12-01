@@ -157,6 +157,43 @@ public class UnixFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
         return new FTPClientConfig(FTPClientConfig.SYST_UNIX, DEFAULT_DATE_FORMAT, DEFAULT_RECENT_DATE_FORMAT);
     }
 
+
+    // oddball cases like symbolic links, file names
+    // with spaces in them.
+    private void checkOddball(FTPFile file, int type, String name)
+    {
+        if (type == FTPFile.SYMBOLIC_LINK_TYPE) {
+
+            final int end = name.indexOf(" -> ");
+            // Give up if no link indicator is present
+            if (end == -1) {
+                file.setName(name);
+            } else {
+                file.setName(name.substring(0, end));
+                file.setLink(name.substring(end + 4));
+            }
+
+        } else {
+            file.setName(name);
+        }
+    }
+
+    //Used in parseFTPEntry, requires previous regex match.
+    private void checkJapaneseFormat(FTPFile file, String datestr)
+    {
+        try {
+            if (group(19).contains(JA_MONTH)) { // special processing for Japanese format
+                final FTPTimestampParserImpl jaParser = new FTPTimestampParserImpl();
+                jaParser.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX, DEFAULT_DATE_FORMAT_JA, DEFAULT_RECENT_DATE_FORMAT_JA));
+                file.setTimestamp(jaParser.parseTimestamp(datestr));
+            } else {
+                file.setTimestamp(super.parseTimestamp(datestr));
+            }
+        } catch (final ParseException e) {
+            // intentionally do nothing
+        }
+    }
+
     /**
      * Parses a line of a unix (standard) FTP server file listing and converts it into a usable format in the form of an <code> FTPFile </code> instance. If the
      * file listing line doesn't describe a file, <code> null </code> is returned, otherwise a <code> FTPFile </code> instance representing the files in the
@@ -184,17 +221,7 @@ public class UnixFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
                 name = name.replaceFirst("^\\s+", "");
             }
 
-            try {
-                if (group(19).contains(JA_MONTH)) { // special processing for Japanese format
-                    final FTPTimestampParserImpl jaParser = new FTPTimestampParserImpl();
-                    jaParser.configure(new FTPClientConfig(FTPClientConfig.SYST_UNIX, DEFAULT_DATE_FORMAT_JA, DEFAULT_RECENT_DATE_FORMAT_JA));
-                    file.setTimestamp(jaParser.parseTimestamp(datestr));
-                } else {
-                    file.setTimestamp(super.parseTimestamp(datestr));
-                }
-            } catch (final ParseException e) {
-                // intentionally do nothing
-            }
+            checkJapaneseFormat(file, datestr);
 
             // A 'whiteout' file is an ARTIFICIAL entry in any of several types of
             // 'translucent' filesystems, of which a 'union' filesystem is one.
@@ -252,22 +279,8 @@ public class UnixFTPEntryParser extends ConfigurableFTPFileEntryParserImpl {
                 // intentionally do nothing
             }
 
-            // oddball cases like symbolic links, file names
-            // with spaces in them.
-            if (type == FTPFile.SYMBOLIC_LINK_TYPE) {
+            checkOddball(file, type, name);
 
-                final int end = name.indexOf(" -> ");
-                // Give up if no link indicator is present
-                if (end == -1) {
-                    file.setName(name);
-                } else {
-                    file.setName(name.substring(0, end));
-                    file.setLink(name.substring(end + 4));
-                }
-
-            } else {
-                file.setName(name);
-            }
             return file;
         }
         return null;

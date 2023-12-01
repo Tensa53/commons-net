@@ -218,6 +218,14 @@ public final class Util {
         return copyStream(source, dest, bufferSize, streamSize, listener, true);
     }
 
+
+    //Flush dest if it should be flushed
+    private static void checkFlush(boolean flush, OutputStream dest) throws IOException {
+        if (flush) {
+            dest.flush();
+        }
+    }
+
     /**
      * Copies the contents of an InputStream to an OutputStream using a copy buffer of a given size and notifies the provided CopyStreamListener of the progress
      * of the copy operation by calling its bytesTransferred(long, int) method after each write to the destination. If you wish to notify more than one listener
@@ -257,9 +265,7 @@ public final class Util {
                         break;
                     }
                     dest.write(singleByte);
-                    if (flush) {
-                        dest.flush();
-                    }
+                    checkFlush(flush, dest);
                     ++total;
                     if (listener != null) {
                         listener.bytesTransferred(total, 1, streamSize);
