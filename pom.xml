@@ -136,6 +136,16 @@ Supported protocols include Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Teln
             <version>3.13.0</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>2.0.7</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.7</version>
+        </dependency>
     </dependencies>
 
     <build>
@@ -228,6 +238,7 @@ Supported protocols include Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Teln
                                             value="${project.organization.name}" />
                                         <attribute name="Implementation-Version" value="${project.version}" />
                                         <attribute name="Implementation-Vendor-Id" value="org.apache" />
+                                        <!--suppress UnresolvedMavenProperty -->
                                         <attribute name="Implementation-Build" value="${implementation.build}" />
                                         <attribute name="X-Compile-Source-JDK"
                                             value="${maven.compiler.source}" />
@@ -249,6 +260,7 @@ Supported protocols include Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Teln
                                             value="${project.organization.name}" />
                                         <attribute name="Implementation-Version" value="${project.version}" />
                                         <attribute name="Implementation-Vendor-Id" value="org.apache" />
+                                        <!--suppress UnresolvedMavenProperty -->
                                         <attribute name="Implementation-Build" value="${implementation.build}" />
                                         <attribute name="X-Compile-Source-JDK"
                                             value="${maven.compiler.source}" />
@@ -434,15 +446,6 @@ Supported protocols include Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Teln
                 <commons.net.trace_calls>true</commons.net.trace_calls>
                 <commons.net.add_listener>true</commons.net.add_listener>
             </properties>
-            <dependencies>
-                <!-- adds logging for MINA ftpserver as used by FTPSClientTest -->
-                <dependency>
-                    <groupId>org.slf4j</groupId>
-                    <artifactId>slf4j-simple</artifactId>
-                    <version>1.7.21</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
         </profile>
     </profiles>
 
