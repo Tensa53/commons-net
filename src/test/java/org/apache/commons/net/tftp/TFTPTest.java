@@ -16,22 +16,24 @@
  */
 package org.apache.commons.net.tftp;
 
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
+import java.io.*;
 
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.net.io.ToNetASCIIInputStream;
 import org.apache.commons.net.tftp.TFTPServer.ServerMode;
 
 import junit.framework.TestCase;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 /**
  * Test the TFTP Server and TFTP Client by creating some FILES in the system temp folder and then uploading and downloading them.
  */
-public class TFTPTest extends TestCase {
+@State(org.openjdk.jmh.annotations.Scope.Benchmark)
+
+//Funzione custom, non si può cambiare nulla. Magari faccio grafico?
+
+public class TFTPTest extends TestCase {    //18.
     private static final int SERVER_PORT = 6902;
     private static TFTPServer tftpS;
     private static final File SERVER_DIR = FileUtils.getTempDirectory();
@@ -60,6 +62,15 @@ public class TFTPTest extends TestCase {
         }
 
     }
+
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @Fork(value = 4)
+    @Measurement(iterations = 4)
+    public void runBench(Blackhole bh) throws Exception {
+       testASCIIUploads();
+    }
+
 
     /*
      * Create a file, size specified in bytes
@@ -92,7 +103,7 @@ public class TFTPTest extends TestCase {
         super.tearDown();
     }
 
-    public void testASCIIDownloads() {
+    public void testASCIIDownloads() { //0,213 s/op
         // test with the smaller FILES
         for (int i = 0; i < 6; i++) {
             try {
@@ -104,7 +115,7 @@ public class TFTPTest extends TestCase {
         }
     }
 
-    public void testASCIIUploads() throws Exception {
+    public void testASCIIUploads() throws Exception { //4,437 s/op -> 0,794 s/op rimuovendo toAscii. Uguale al testBinaryUploads
         // test with the smaller FILES
         for (int i = 0; i < 6; i++) {
             testUpload(TFTP.ASCII_MODE, FILES[i]);
@@ -135,27 +146,27 @@ public class TFTPTest extends TestCase {
         }
     }
 
-    public void testHugeDownloads() throws Exception {
+    public void testHugeDownloads() throws Exception { //5,826 s/op
         // test with the smaller FILES
         for (int i = 5; i < FILES.length; i++) {
             testDownload(TFTP.BINARY_MODE, FILES[i]);
         }
     }
 
-    public void testHugeUploads() throws Exception {
+    public void testHugeUploads() throws Exception { //5,918 s/op
         for (int i = 5; i < FILES.length; i++) {
             testUpload(TFTP.BINARY_MODE, FILES[i]);
         }
     }
 
-    public void testTFTPBinaryDownloads() throws Exception {
+    public void testTFTPBinaryDownloads() throws Exception { //0,170 s/op
         // test with the smaller FILES
         for (int i = 0; i < 6; i++) {
             testDownload(TFTP.BINARY_MODE, FILES[i]);
         }
     }
 
-    public void testTFTPBinaryUploads() throws Exception {
+    public void testTFTPBinaryUploads() throws Exception { //0,808 s/op
         // test with the smaller FILES
         for (int i = 0; i < 6; i++) {
             testUpload(TFTP.BINARY_MODE, FILES[i]);

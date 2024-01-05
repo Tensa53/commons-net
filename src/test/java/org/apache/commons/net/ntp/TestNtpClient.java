@@ -25,16 +25,28 @@ import org.junit.AfterClass;
 import org.junit.Assert;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 /**
  * JUnit test class for NtpClient using SimpleNTPServer
  */
+@State(org.openjdk.jmh.annotations.Scope.Benchmark)
 public class TestNtpClient {
 
     private static SimpleNTPServer server;
 
+    @Benchmark
+    @BenchmarkMode(Mode.AverageTime)
+    @Fork(value = 4)
+    @Measurement(iterations = 4)
+    public void runBench(Blackhole bh) throws IOException {
+        oneTimeSetUp();
+        oneTimeTearDown();
+    }
+
     @BeforeClass
-    public static void oneTimeSetUp() throws IOException {
+    public static void oneTimeSetUp() throws IOException { //2,007 s/op --> 0,109 s/op after modifying
         // one-time initialization code
         server = new SimpleNTPServer(0);
         server.connect();
@@ -54,7 +66,7 @@ public class TestNtpClient {
             }
             // if not running then sleep 2 seconds and try again
             try {
-                Thread.sleep(2000);
+                Thread.sleep(100);
             } catch (final InterruptedException e) {
                 // ignore
             }
@@ -63,7 +75,7 @@ public class TestNtpClient {
     }
 
     @AfterClass
-    public static void oneTimeTearDown() {
+    public static void oneTimeTearDown() { //0,001 s/op
         // one-time cleanup code
         if (server != null) {
             server.stop();
@@ -72,7 +84,7 @@ public class TestNtpClient {
     }
 
     @Test
-    public void testGetTime() throws IOException {
+    public void testGetTime() throws IOException {  //0,003 s/op
         final long currentTimeMillis = System.currentTimeMillis();
         final NTPUDPClient client = new NTPUDPClient();
         // timeout if response takes longer than 2 seconds

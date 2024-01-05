@@ -31,6 +31,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.Parameterized;
 import org.junit.runners.Parameterized.Parameters;
+import org.openjdk.jmh.annotations.*;
+import org.openjdk.jmh.infra.Blackhole;
 
 /**
  * Tests {@link FTPSClient}.
@@ -46,7 +48,8 @@ import org.junit.runners.Parameterized.Parameters;
  * </p>
  */
 @RunWith(Parameterized.class)
-public class FTPSClientTest extends AbstractFtpsTest {
+public class FTPSClientTest extends AbstractFtpsTest { //Impossibile usare benchmark, non ha costruttore pubblico di default.
+
 
     private static final String USER_PROPS_RES = "org/apache/commons/net/ftpsserver/users.properties";
 
