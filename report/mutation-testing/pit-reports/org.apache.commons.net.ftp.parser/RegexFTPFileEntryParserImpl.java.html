@@ -1,0 +1,2901 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=ISO-8859-1">
+    <link rel="stylesheet" type="text/css" href="../style.css">
+</head>
+<body>
+
+
+<h1>RegexFTPFileEntryParserImpl.java</h1>
+
+<table class="src">
+
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_1'/>
+1
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_1'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/*</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_2'/>
+2
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_2'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Licensed to the Apache Software Foundation (ASF) under one or more</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_3'/>
+3
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_3'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * contributor license agreements.  See the NOTICE file distributed with</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_4'/>
+4
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_4'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * this work for additional information regarding copyright ownership.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_5'/>
+5
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_5'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * The ASF licenses this file to You under the Apache License, Version 2.0</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_6'/>
+6
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_6'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * (the &#34;License&#34;); you may not use this file except in compliance with</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_7'/>
+7
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_7'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * the License.  You may obtain a copy of the License at</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_8'/>
+8
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_8'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_9'/>
+9
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_9'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *      http://www.apache.org/licenses/LICENSE-2.0</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_10'/>
+10
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_10'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_11'/>
+11
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_11'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * Unless required by applicable law or agreed to in writing, software</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_12'/>
+12
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_12'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * distributed under the License is distributed on an &#34;AS IS&#34; BASIS,</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_13'/>
+13
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_13'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_14'/>
+14
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_14'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * See the License for the specific language governing permissions and</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_15'/>
+15
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_15'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * limitations under the License.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_16'/>
+16
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_16'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_17'/>
+17
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_17'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_18'/>
+18
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_18'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>package org.apache.commons.net.ftp.parser;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_19'/>
+19
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_19'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_20'/>
+20
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_20'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.regex.MatchResult;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_21'/>
+21
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_21'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.regex.Matcher;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_22'/>
+22
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_22'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.regex.Pattern;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_23'/>
+23
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_23'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import java.util.regex.PatternSyntaxException;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_24'/>
+24
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_24'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_25'/>
+25
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_25'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>import org.apache.commons.net.ftp.FTPFileEntryParserImpl;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_26'/>
+26
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_26'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_27'/>
+27
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_27'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>/**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_28'/>
+28
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_28'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * This abstract class implements both the older FTPFileListParser and newer FTPFileEntryParser interfaces with default functionality. All the classes in the</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_29'/>
+29
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_29'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * parser subpackage inherit from this.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_30'/>
+30
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_30'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_31'/>
+31
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_31'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> * This is the base class for all regular expression based FTPFileEntryParser classes</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_32'/>
+32
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_32'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''> */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_33'/>
+33
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_33'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>public abstract class RegexFTPFileEntryParserImpl extends FTPFileEntryParserImpl {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_34'/>
+34
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_34'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_35'/>
+35
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_35'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * internal pattern the matcher tries to match, representing a file entry</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_36'/>
+36
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_36'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_37'/>
+37
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_37'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private Pattern pattern;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_38'/>
+38
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_38'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_39'/>
+39
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_39'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_40'/>
+40
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_40'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * internal match result used by the parser</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_41'/>
+41
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_41'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_42'/>
+42
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_42'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private MatchResult result;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_43'/>
+43
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_43'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_44'/>
+44
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_44'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_45'/>
+45
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_45'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Internal PatternMatcher object used by the parser. It has protected scope in case subclasses want to make use of it for their own purposes.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_46'/>
+46
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_46'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_47'/>
+47
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_47'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    protected Matcher _matcher_;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_48'/>
+48
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_48'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_49'/>
+49
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_49'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_50'/>
+50
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_50'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * The constructor for a RegexFTPFileEntryParserImpl object. The expression is compiled with flags = 0.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_51'/>
+51
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_51'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_52'/>
+52
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_52'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param regex The regular expression with which this object is initialized.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_53'/>
+53
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_53'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_54'/>
+54
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_54'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @throws IllegalArgumentException Thrown if the regular expression is unparseable. Should not be seen in normal conditions. If it is seen, this is a sign</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_55'/>
+55
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_55'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *                                  that a subclass has been created with a bad regular expression. Since the parser must be created before use, this means</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_56'/>
+56
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_56'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *                                  that any bad parser subclasses created from this will bomb very quickly, leading to easy detection.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_57'/>
+57
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_57'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_58'/>
+58
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_58'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_59'/>
+59
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_59'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    public RegexFTPFileEntryParserImpl(final String regex) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_60'/>
+60
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_60'>1</a>
+<span>
+1. &#60;init&#62; : removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        compileRegex(regex, 0);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_61'/>
+61
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_61'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_62'/>
+62
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_62'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_63'/>
+63
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_63'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_64'/>
+64
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_64'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * The constructor for a RegexFTPFileEntryParserImpl object.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_65'/>
+65
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_65'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_66'/>
+66
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_66'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param regex The regular expression with which this object is initialized.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_67'/>
+67
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_67'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param flags the flags to apply, see {@link Pattern#compile(String, int)}. Use 0 for none.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_68'/>
+68
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_68'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_69'/>
+69
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_69'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @throws IllegalArgumentException Thrown if the regular expression is unparseable. Should not be seen in normal conditions. If it is seen, this is a sign</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_70'/>
+70
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_70'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *                                  that a subclass has been created with a bad regular expression. Since the parser must be created before use, this means</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_71'/>
+71
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_71'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *                                  that any bad parser subclasses created from this will bomb very quickly, leading to easy detection.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_72'/>
+72
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_72'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @since 3.4</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_73'/>
+73
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_73'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_74'/>
+74
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_74'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    public RegexFTPFileEntryParserImpl(final String regex, final int flags) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_75'/>
+75
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_75'>1</a>
+<span>
+1. &#60;init&#62; : removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        compileRegex(regex, flags);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_76'/>
+76
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_76'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_77'/>
+77
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_77'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_78'/>
+78
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_78'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_79'/>
+79
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_79'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Compile the regex and store the {@link Pattern}.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_80'/>
+80
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_80'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_81'/>
+81
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_81'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * This is an internal method to do the work so the constructor does not have to call an overrideable method.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_82'/>
+82
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_82'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_83'/>
+83
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_83'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param regex the expression to compile</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_84'/>
+84
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_84'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param flags the flags to apply, see {@link Pattern#compile(String, int)}. Use 0 for none.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_85'/>
+85
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_85'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @throws IllegalArgumentException if the regex cannot be compiled</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_86'/>
+86
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_86'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_87'/>
+87
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_87'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    private void compileRegex(final String regex, final int flags) {</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_88'/>
+88
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_88'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        try {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_89'/>
+89
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_89'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            pattern = Pattern.compile(regex, flags);</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_90'/>
+90
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_90'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>        } catch (final PatternSyntaxException pse) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_91'/>
+91
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_91'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            throw new IllegalArgumentException(&#34;Unparseable regex supplied: &#34; + regex);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_92'/>
+92
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_92'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_93'/>
+93
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_93'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_94'/>
+94
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_94'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_95'/>
+95
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_95'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_96'/>
+96
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_96'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Convenience method</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_97'/>
+97
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_97'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_98'/>
+98
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_98'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return the number of groups() in the internal MatchResult.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_99'/>
+99
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_99'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_100'/>
+100
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_100'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_101'/>
+101
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_101'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public int getGroupCnt() {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_102'/>
+102
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_102'>1</a>
+<span>
+1. getGroupCnt : negated conditional &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        if (this.result == null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_103'/>
+103
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_103'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            return 0;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_104'/>
+104
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_104'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_105'/>
+105
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_105'>1</a>
+<span>
+1. getGroupCnt : replaced int return with 0 for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::getGroupCnt &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        return this.result.groupCount();</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_106'/>
+106
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_106'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_107'/>
+107
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_107'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_108'/>
+108
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_108'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_109'/>
+109
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_109'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * For debugging purposes - returns a string shows each match group by number.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_110'/>
+110
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_110'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_111'/>
+111
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_111'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return a string shows each match group by number.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_112'/>
+112
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_112'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_113'/>
+113
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_113'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_114'/>
+114
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_114'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public String getGroupsAsString() {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_115'/>
+115
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_115'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>        final StringBuilder b = new StringBuilder();</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_116'/>
+116
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_116'>2</a>
+<span>
+1. getGroupsAsString : negated conditional &rarr; NO_COVERAGE<br/>
+2. getGroupsAsString : changed conditional boundary &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        for (int i = 1; i &#60;= this.result.groupCount(); i++) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_117'/>
+117
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_117'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class=''>            b.append(i).append(&#34;) &#34;).append(this.result.group(i)).append(System.lineSeparator());</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_118'/>
+118
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_118'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_119'/>
+119
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_119'>1</a>
+<span>
+1. getGroupsAsString : replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::getGroupsAsString &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        return b.toString();</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_120'/>
+120
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_120'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_121'/>
+121
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_121'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_122'/>
+122
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_122'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_123'/>
+123
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_123'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Convenience method delegates to the internal MatchResult&#39;s group() method.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_124'/>
+124
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_124'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_125'/>
+125
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_125'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param matchNum match group number to be retrieved</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_126'/>
+126
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_126'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_127'/>
+127
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_127'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return the content of the &#60;code&#62;matchnum&#39;th&#60;/code&#62; group of the internal match or null if this method is called without a match having been made.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_128'/>
+128
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_128'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_129'/>
+129
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_129'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public String group(final int matchNum) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_130'/>
+130
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_130'>1</a>
+<span>
+1. group : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (this.result == null) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_131'/>
+131
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_131'>1</a>
+<span>
+1. group : replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::group &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>            return null;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_132'/>
+132
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_132'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_133'/>
+133
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_133'>1</a>
+<span>
+1. group : replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::group &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return this.result.group(matchNum);</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_134'/>
+134
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_134'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_135'/>
+135
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_135'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_136'/>
+136
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_136'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_137'/>
+137
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_137'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Convenience method delegates to the internal MatchResult&#39;s matches() method.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_138'/>
+138
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_138'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_139'/>
+139
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_139'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param s the String to be matched</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_140'/>
+140
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_140'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return true if s matches this object&#39;s regular expression.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_141'/>
+141
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_141'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_142'/>
+142
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_142'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_143'/>
+143
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_143'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public boolean matches(final String s) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_144'/>
+144
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_144'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        this.result = null;</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_145'/>
+145
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_145'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>        _matcher_ = pattern.matcher(s);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_146'/>
+146
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_146'>1</a>
+<span>
+1. matches : negated conditional &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        if (_matcher_.matches()) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_147'/>
+147
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_147'></a>
+<span>
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class=''>            this.result = _matcher_.toMatchResult();</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_148'/>
+148
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_148'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>        }</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_149'/>
+149
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_149'>2</a>
+<span>
+1. matches : negated conditional &rarr; KILLED<br/>
+2. matches : replaced boolean return with true for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::matches &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        return null != this.result;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_150'/>
+150
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_150'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_151'/>
+151
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_151'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_152'/>
+152
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_152'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_153'/>
+153
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_153'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Alter the current regular expression being utilised for entry parsing and create a new {@link Pattern} instance.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_154'/>
+154
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_154'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_155'/>
+155
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_155'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param regex The new regular expression</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_156'/>
+156
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_156'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return true</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_157'/>
+157
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_157'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @since 2.0</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_158'/>
+158
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_158'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @throws IllegalArgumentException if the regex cannot be compiled</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_159'/>
+159
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_159'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_160'/>
+160
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_160'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public boolean setRegex(final String regex) {</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_161'/>
+161
+</td>
+<td class='killed'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_161'>1</a>
+<span>
+1. setRegex : removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='killed'>        compileRegex(regex, 0);</span></pre></td></tr>
+
+
+<tr>
+<td class='covered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_162'/>
+162
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_162'>1</a>
+<span>
+1. setRegex : replaced boolean return with false for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::setRegex &rarr; SURVIVED<br/>
+
+</span>
+</span>
+</td>
+<td class='covered'><pre><span  class='survived'>        return true;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_163'/>
+163
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_163'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_164'/>
+164
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_164'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''></span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_165'/>
+165
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_165'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    /**</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_166'/>
+166
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_166'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * Alter the current regular expression being utilised for entry parsing and create a new {@link Pattern} instance.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_167'/>
+167
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_167'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     *</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_168'/>
+168
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_168'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param regex The new regular expression</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_169'/>
+169
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_169'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @param flags the flags to apply, see {@link Pattern#compile(String, int)}. Use 0 for none.</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_170'/>
+170
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_170'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @return true</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_171'/>
+171
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_171'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @since 3.4</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_172'/>
+172
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_172'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     * @throws IllegalArgumentException if the regex cannot be compiled</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_173'/>
+173
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_173'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>     */</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_174'/>
+174
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_174'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    public boolean setRegex(final String regex, final int flags) {</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_175'/>
+175
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_175'>1</a>
+<span>
+1. setRegex : removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        compileRegex(regex, flags);</span></pre></td></tr>
+
+
+<tr>
+<td class='uncovered'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_176'/>
+176
+</td>
+<td class='survived'>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_176'>1</a>
+<span>
+1. setRegex : replaced boolean return with false for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::setRegex &rarr; NO_COVERAGE<br/>
+
+</span>
+</span>
+</td>
+<td class='uncovered'><pre><span  class='survived'>        return true;</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_177'/>
+177
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_177'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>    }</span></pre></td></tr>
+
+
+<tr>
+<td class='na'>
+<a name='org.pitest.mutationtest.report.html.SourceFile@639db75_178'/>
+178
+</td>
+<td class=''>
+<span class='pop'>
+<a href='#grouporg.pitest.mutationtest.report.html.SourceFile@639db75_178'></a>
+<span>
+</span>
+</span>
+</td>
+<td class=''><pre><span  class=''>}</span></pre></td></tr>
+
+
+
+<tr><td></td><td></td><td><h2>Mutations</h2></td></tr>
+
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_60'>60</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_60'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>&#60;init&#62;<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_75'>75</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_75'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>&#60;init&#62;<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testDirectoryBeginningWithNumber(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)]</span></span> removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_102'>102</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_102'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getGroupCnt<br/><b>Killed by : </b>none</span></span> negated conditional &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_105'>105</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_105'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getGroupCnt<br/><b>Killed by : </b>none</span></span> replaced int return with 0 for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::getGroupCnt &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_116'>116</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_116'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getGroupsAsString<br/><b>Killed by : </b>none</span></span> negated conditional &rarr; NO_COVERAGE</p> <p class='NO_COVERAGE'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>getGroupsAsString<br/><b>Killed by : </b>none</span></span> changed conditional boundary &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_119'>119</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_119'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>getGroupsAsString<br/><b>Killed by : </b>none</span></span> replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::getGroupsAsString &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_130'>130</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_130'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>group<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_131'>131</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_131'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>group<br/><b>Killed by : </b>none</span></span> replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::group &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_133'>133</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_133'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>group<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> replaced return value with &#34;&#34; for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::group &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_146'>146</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_146'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>matches<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> negated conditional &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_149'>149</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_149'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>matches<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> negated conditional &rarr; KILLED</p> <p class='KILLED'><span class='pop'>2.<span><b>2</b><br/><b>Location : </b>matches<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)]</span></span> replaced boolean return with true for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::matches &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_161'>161</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_161'/> 
+
+<p class='KILLED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setRegex<br/><b>Killed by : </b>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testJesLevel1Listing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)]</span></span> removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; KILLED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_162'>162</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_162'/> 
+
+<p class='SURVIVED'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setRegex<br/><b>Killed by : </b>none</span></span> replaced boolean return with false for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::setRegex &rarr; SURVIVED</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_175'>175</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_175'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setRegex<br/><b>Killed by : </b>none</span></span> removed call to org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::compileRegex &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+<tr>
+<td><a href='#org.pitest.mutationtest.report.html.SourceFile@639db75_176'>176</a></td> 
+<td></td>
+<td>
+
+<a name='grouporg.pitest.mutationtest.report.html.SourceFile@639db75_176'/> 
+
+<p class='NO_COVERAGE'><span class='pop'>1.<span><b>1</b><br/><b>Location : </b>setRegex<br/><b>Killed by : </b>none</span></span> replaced boolean return with false for org/apache/commons/net/ftp/parser/RegexFTPFileEntryParserImpl::setRegex &rarr; NO_COVERAGE</p> 
+</td>
+</tr>
+
+</table>
+
+
+<h2>Active mutators</h2>
+<ul>
+<li class='mutator'>CONDITIONALS_BOUNDARY</li>
+<li class='mutator'>EMPTY_RETURNS</li>
+<li class='mutator'>FALSE_RETURNS</li>
+<li class='mutator'>INCREMENTS</li>
+<li class='mutator'>INVERT_NEGS</li>
+<li class='mutator'>MATH</li>
+<li class='mutator'>NEGATE_CONDITIONALS</li>
+<li class='mutator'>NULL_RETURNS</li>
+<li class='mutator'>PRIMITIVE_RETURNS</li>
+<li class='mutator'>TRUE_RETURNS</li>
+<li class='mutator'>VOID_METHOD_CALLS</li>
+
+</ul>
+
+<h2>Tests examined</h2>
+<ul>
+<li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testDirectoryBeginningWithNumber(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testDirectoryBeginningWithNumberFollowedBySpaces(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testInconsistentListing(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testParseLeadingDigits(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testNET339(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testNET516(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (2 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testGroupNameWithSpaces(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest]/[test:testDefaultParserFactory(org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest)] (3 ms)</li><li>org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest]/[test:testDefaultParserFactoryConfig(org.apache.commons.net.ftp.parser.DefaultFTPFileEntryParserFactoryTest)] (3 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NTFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NTFTPEntryParserTest]/[test:testConsistentListing(org.apache.commons.net.ftp.parser.NTFTPEntryParserTest)] (1 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testJesLevel1Listing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testJesLevel2Listing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (2 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testMemberListing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testParseFileNameWithSpaces(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testFilenamesWithEmbeddedNumbers(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testTrailingSpaces(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testInconsistentListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testOwnerAndGroupNameWithSpaces(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testLeadingSpacesNET566(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testInconsistentListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testLeadingSpacesDefault(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testOwnerNameWithSpaces(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.NetwareFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testNameWIthPunctuation(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testGroupNameWithSpaces(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testTrimLeadingSpacesNET566(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testNoSpacesBeforeFileSize(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testNET573(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testConsistentListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testNET294(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (8 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testNumericDateFormat(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testCorrectGroupNameParsing(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testParseFieldsOnFileJapaneseTime(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.MacOsPeterFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (1 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testWholeListParse(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testParseFieldsOnFile(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest]/[test:testParseFieldsOnAIX(org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testParseFieldsOnFileJapaneseYear(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testUnixListings(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testWholeListParseWithVersioning(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest]/[test:testGoodListing(org.apache.commons.net.ftp.parser.UnixFTPEntryParserTest)] (2 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testConsistentListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (1 ms)</li><li>org.apache.commons.net.ftp.FTPClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPClientTest]/[test:testUnparseableFiles(org.apache.commons.net.ftp.FTPClientTest)] (5 ms)</li><li>org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest]/[test:testParseEntryWithSymlink(org.apache.commons.net.ftp.parser.FTPConfigEntryParserTest)] (9 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.OS400FTPEntryParserTest)] (4 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=true%5D]/[test:testListFilesPathNameRoot%5BendpointCheckingEnabled=true%5D(org.apache.commons.net.ftp.FTPSClientTest)] (298 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=true%5D]/[test:testListFilesPathNameEmpty%5BendpointCheckingEnabled=true%5D(org.apache.commons.net.ftp.FTPSClientTest)] (298 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=true%5D]/[test:testListFilesPathNameNull%5BendpointCheckingEnabled=true%5D(org.apache.commons.net.ftp.FTPSClientTest)] (301 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=false%5D]/[test:testListFilesPathNameRoot%5BendpointCheckingEnabled=false%5D(org.apache.commons.net.ftp.FTPSClientTest)] (306 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=false%5D]/[test:testListFilesPathNameEmpty%5BendpointCheckingEnabled=false%5D(org.apache.commons.net.ftp.FTPSClientTest)] (306 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=false%5D]/[test:testListFilesPathNameNull%5BendpointCheckingEnabled=false%5D(org.apache.commons.net.ftp.FTPSClientTest)] (308 ms)</li><li>org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest]/[test:testParseFieldsOnDirectory(org.apache.commons.net.ftp.parser.EnterpriseUnixFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.OS2FTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.VMSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testRecentPrecision(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest]/[test:testDefaultPrecision(org.apache.commons.net.ftp.parser.OS400FTPEntryParserAdditionalTest)] (0 ms)</li><li>org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest]/[test:testBadListing(org.apache.commons.net.ftp.parser.MVSFTPEntryParserTest)] (0 ms)</li><li>org.apache.commons.net.ftp.FTPClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPClientTest]/[test:testParserCachingNullKey(org.apache.commons.net.ftp.FTPClientTest)] (1 ms)</li><li>org.apache.commons.net.ftp.FTPClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPClientTest]/[test:testParserCachingWithKey(org.apache.commons.net.ftp.FTPClientTest)] (2 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=true%5D]/[test:testListFilesPathNameJunk%5BendpointCheckingEnabled=true%5D(org.apache.commons.net.ftp.FTPSClientTest)] (211 ms)</li><li>org.apache.commons.net.ftp.FTPSClientTest.[engine:junit-vintage]/[runner:org.apache.commons.net.ftp.FTPSClientTest]/[test:%5BendpointCheckingEnabled=false%5D]/[test:testListFilesPathNameJunk%5BendpointCheckingEnabled=false%5D(org.apache.commons.net.ftp.FTPSClientTest)] (215 ms)</li>
+</ul>
+
+<br/>
+
+Report generated by <a href='https://pitest.org'>PIT</a> 1.15.2
+
+</body>
+</html>
