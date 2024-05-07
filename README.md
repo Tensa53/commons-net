@@ -40,8 +40,16 @@
  |                                                                      |
  +======================================================================+
 --->
-Apache Commons Net
+Apache Commons Net - Forked by Daniele Fabiano and Francesco Maria Puca
 ===================
+
+Why this fork?
+--------------
+This fork aims to realize a dependability analysis of the library for the Software Dependability Course. 
+You can find the documentation of this analysis inside the document folder and the execution output of some tools we used inside the report folder.
+
+What is Apache Commons Net? (Original README)
+--------------
 
 [![Java CI](https://github.com/apache/commons-net/actions/workflows/maven.yml/badge.svg)](https://github.com/apache/commons-net/actions/workflows/maven.yml)
 [![Coverage Status](https://codecov.io/gh/apache/commons-net/branch/master/graph/badge.svg)](https://app.codecov.io/gh/apache/commons-net)
@@ -51,9 +59,7 @@ Apache Commons Net
 [![OpenSSF Scorecard](https://api.securityscorecards.dev/projects/github.com/apache/commons-net/badge)](https://api.securityscorecards.dev/projects/github.com/apache/commons-net)
 
 Apache Commons Net library contains a collection of network utilities and protocol implementations.
-Supported protocols include: Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois.
-
-Forked by Daniele Fabiano and Francesco Maria Puca.
+Supported protocols include: Echo, Finger, FTP, NNTP, NTP, POP3(S), SMTP(S), Telnet, Whois. 
 
 Documentation
 -------------
